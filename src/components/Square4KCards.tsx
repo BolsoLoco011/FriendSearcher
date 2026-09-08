@@ -39,13 +39,13 @@ export const Square4KCards: React.FC<Square4KCardsProps> = ({
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 gap-2">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs uppercase tracking-wider font-bold text-sky-600">
+            <span className="text-xs uppercase tracking-wider font-extrabold text-sky-800">
               Ecosistemas de Afinidad
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-            <span className="text-xs text-slate-400 font-medium">Resolución 4K Ultra HD</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-600"></span>
+            <span className="text-xs text-sky-700 font-semibold">Resolución 4K Ultra HD</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-sky-950 tracking-tight">
             Los {categories.length} Cuadrados de Conexión
           </h2>
         </div>
@@ -54,7 +54,7 @@ export const Square4KCards: React.FC<Square4KCardsProps> = ({
           {selectedCategory !== 'all' && (
             <button
               onClick={() => onSelectCategory('all')}
-              className="text-xs font-semibold text-sky-700 hover:text-sky-800 bg-white border border-sky-200 px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+              className="text-xs font-bold text-sky-950 hover:text-white hover:bg-sky-600 bg-sky-200 border border-sky-400 px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
             >
               <Filter className="w-3.5 h-3.5" />
               Restablecer filtro (Ver todos)
@@ -63,8 +63,8 @@ export const Square4KCards: React.FC<Square4KCardsProps> = ({
         </div>
       </div>
 
-      {/* Grid of 6 Square 4K HD Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4 lg:gap-5">
+      {/* Grid of 5 Square 4K HD Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5">
         {categories.map((cat) => {
           const isSelected = selectedCategory === cat.key;
 
@@ -73,10 +73,10 @@ export const Square4KCards: React.FC<Square4KCardsProps> = ({
               key={cat.key}
               id={`square-4k-${cat.key}`}
               onClick={() => onSelectCategory(isSelected ? 'all' : cat.key)}
-              className={`group relative aspect-square rounded-2xl sm:rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 select-none bg-white ${
+              className={`group relative aspect-square rounded-2xl sm:rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 select-none bg-sky-100 ${
                 isSelected
-                  ? 'border-2 border-sky-500 shadow-lg shadow-sky-100 ring-4 ring-sky-100 scale-[1.02]'
-                  : 'border border-slate-200/90 shadow-2xs hover:border-sky-300 hover:shadow-md'
+                  ? 'border-4 border-sky-500 shadow-xl shadow-sky-300 ring-4 ring-sky-300 scale-[1.03]'
+                  : 'border-2 border-sky-300 shadow-sm hover:border-sky-500 hover:shadow-md'
               }`}
             >
               {/* Background 4K HD Image */}

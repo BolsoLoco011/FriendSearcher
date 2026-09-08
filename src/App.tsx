@@ -17,6 +17,7 @@ import { OnboardingProfileModal } from './components/OnboardingProfileModal';
 import { unifyDuplicateProfiles } from './utils/unifyProfiles';
 import { 
   CATEGORIES_DATA, 
+  CARACTERISTICAS_CATEGORY,
   INITIAL_FRIENDS, 
   INITIAL_MEMES, 
   INITIAL_COOKING, 
@@ -478,7 +479,9 @@ export default function App() {
 
   // Open Category detail
   const handleOpenCategoryDetail = (key: CategoryKey) => {
-    const cat = CATEGORIES_DATA.find(c => c.key === key) || null;
+    const cat = key === 'caracteristicas' 
+      ? CARACTERISTICAS_CATEGORY 
+      : CATEGORIES_DATA.find(c => c.key === key) || null;
     setActiveCategoryModal(cat);
   };
 
@@ -629,12 +632,12 @@ export default function App() {
   // 1. Initial auth loading state
   if (isAuthInitializing) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        <div className="w-12 h-12 rounded-2xl bg-sky-500 text-white flex items-center justify-center shadow-lg shadow-sky-200 mb-4 animate-pulse">
+      <div className="min-h-screen bg-sky-100 flex flex-col items-center justify-center p-4">
+        <div className="w-12 h-12 rounded-2xl bg-sky-500 text-white flex items-center justify-center shadow-lg shadow-sky-300 mb-4 animate-pulse">
           <Sparkles className="w-6 h-6" />
         </div>
-        <p className="text-sm font-bold text-slate-700">Iniciando FriendSearcher...</p>
-        <p className="text-xs text-slate-400 mt-1">Verificando sesión segura en Firestore</p>
+        <p className="text-sm font-bold text-sky-950">Iniciando FriendSearcher...</p>
+        <p className="text-xs text-sky-700 mt-1">Verificando sesión segura en Firestore</p>
       </div>
     );
   }
@@ -670,7 +673,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col selection:bg-sky-500 selection:text-white">
+    <div className="min-h-screen bg-sky-100 text-sky-950 flex flex-col selection:bg-sky-500 selection:text-white">
       
       {/* App Header with the Celeste Capsule Title */}
       <Header
@@ -680,6 +683,7 @@ export default function App() {
         currentUser={currentUser}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onOpenDbManager={() => setIsDbModalOpen(true)}
+        onOpenCaracteristicas={() => handleOpenCategoryDetail('caracteristicas')}
         isSyncing={isSyncing}
         isAdmin={isAdmin}
       />
@@ -687,38 +691,38 @@ export default function App() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
         
-        {/* Hero Section - Clean Minimalism Presentation */}
-        <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200/80 p-6 sm:p-8 text-center sm:text-left flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+        {/* Hero Section - Full Celeste Theme */}
+        <div className="relative overflow-hidden rounded-3xl bg-sky-50 border border-sky-300/80 p-6 sm:p-8 text-center sm:text-left flex flex-col md:flex-row items-center justify-between gap-6 shadow-md shadow-sky-200/50">
           
           <div className="max-w-2xl">
             {/* Título en Cápsula Celeste Destacada */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs sm:text-sm font-semibold mb-3 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-200/80 border border-sky-400 text-sky-900 text-xs sm:text-sm font-bold mb-3 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-sky-600 animate-pulse"></span>
               <span>Cápsula Celeste de Conexión</span>
-              <span className="text-sky-300">•</span>
-              <span className="text-sky-800">App Web Oficial</span>
+              <span className="text-sky-400">•</span>
+              <span className="text-sky-950">App Web Oficial</span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-sky-950 leading-tight">
               Reinventa cómo hacer amigos con <span className="text-sky-600">FriendSearcher</span>
             </h1>
 
-            <p className="mt-2.5 text-xs sm:text-sm text-slate-500 leading-relaxed">
-              Explora los <strong>cuadrados</strong> de características, memes, cocina, eventos, grupos temáticos y gimnasio. Conecta con personas que vibran en tu misma sintonía con gustos y planes reales.
+            <p className="mt-2.5 text-xs sm:text-sm text-sky-800 leading-relaxed">
+              Explora los <strong>5 cuadrados</strong> de memes, cocina, eventos, grupos y gimnasio. Descubre afinidad en <strong>CARACTERISTICAS</strong> (arriba a la izquierda).
             </p>
 
             <div className="flex flex-wrap items-center gap-3 mt-5 justify-center sm:justify-start text-xs">
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-200/80 text-sky-700 font-medium">
-                <Sparkles className="w-3.5 h-3.5 text-sky-500" />
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100/90 border border-sky-300 text-sky-900 font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-sky-600" />
                 <span>Compatibilidad</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-200/80 text-emerald-700 font-medium">
-                <HeartHandshake className="w-3.5 h-3.5 text-emerald-500" />
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100/90 border border-sky-300 text-sky-900 font-semibold">
+                <HeartHandshake className="w-3.5 h-3.5 text-sky-600" />
                 <span>Base de Datos Firestore Activa</span>
               </div>
               <button 
                 onClick={() => setIsDbModalOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 hover:bg-sky-200 text-sky-800 border border-sky-300 font-semibold cursor-pointer transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-200 hover:bg-sky-300 text-sky-950 border border-sky-400 font-bold cursor-pointer transition-colors"
               >
                 <Flame className="w-3.5 h-3.5 text-amber-500" />
                 <span>Explorar BD Firestore ({friends.length} perfiles)</span>
@@ -727,20 +731,20 @@ export default function App() {
           </div>
 
           {/* Quick Action Badge in Hero */}
-          <div className="bg-slate-50 border border-slate-200/90 p-5 rounded-2xl flex flex-col items-center text-center w-full sm:w-64 flex-shrink-0 shadow-2xs">
-            <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center text-white font-bold mb-2 shadow-md shadow-sky-200">
+          <div className="bg-sky-100/90 border border-sky-300 p-5 rounded-2xl flex flex-col items-center text-center w-full sm:w-64 flex-shrink-0 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center text-white font-bold mb-2 shadow-md shadow-sky-300/80">
               <Compass className="w-6 h-6 animate-spin-slow" />
             </div>
-            <span className="text-xs font-semibold text-slate-500">Explorador Rápido</span>
-            <span className="text-base font-bold text-slate-800 mt-0.5">6 Pilares 4K HD</span>
-            <p className="text-[11px] text-slate-400 mt-1 leading-snug">
+            <span className="text-xs font-bold text-sky-800">Explorador Rápido</span>
+            <span className="text-base font-black text-sky-950 mt-0.5">5 Cuadrados 4K HD</span>
+            <p className="text-[11px] text-sky-700 mt-1 leading-snug">
               Toca un cuadrado para filtrar el feed o ver contenido exclusivo.
             </p>
           </div>
 
         </div>
 
-        {/* 1. LOS CUADRADOS 4K HD DE: CARACTERÍSTICAS, MEMES, COCINA, EVENTOS, GRUPOS Y GIMNASIO */}
+        {/* 1. LOS 5 CUADRADOS 4K HD DE: MEMES, COCINA, EVENTOS, GRUPOS Y GIMNASIO */}
         <Square4KCards
           categories={CATEGORIES_DATA}
           selectedCategory={selectedCategory}
@@ -767,19 +771,19 @@ export default function App() {
 
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500">
+      {/* Footer - Celeste Theme */}
+      <footer className="border-t border-sky-300/70 bg-sky-200/90 py-8 text-center text-xs text-sky-800">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           
           <div className="flex items-center gap-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500 text-white text-xs font-bold shadow-xs">
               FriendSearcher
             </div>
-            <span className="text-slate-500">• Datos en vivo de Google Cloud Firestore</span>
+            <span className="text-sky-900 font-medium">• Datos en vivo de Google Cloud Firestore</span>
           </div>
 
-          <p className="text-slate-400">
-            Características • Memes • Cocina • Eventos • Grupos • Gimnasio
+          <p className="text-sky-800 font-medium">
+            CARACTERISTICAS • Memes • Cocina • Eventos • Grupos • Gimnasio
           </p>
 
           <button
@@ -791,7 +795,7 @@ export default function App() {
               setSelectedCategory('all');
               setActiveTraitFilter(null);
             }}
-            className="text-xs text-sky-600 hover:text-sky-700 font-medium hover:underline cursor-pointer"
+            className="text-xs text-sky-700 hover:text-sky-900 font-bold hover:underline cursor-pointer"
           >
             Restablecer perfil de Bruno Silva a Firestore
           </button>

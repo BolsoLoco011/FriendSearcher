@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+body {
+  background-color: #e0f2fe; /* Tailwind sky-100 celeste */
+  color: #082f49; /* Tailwind sky-950 */
+}
+
 @keyframes spinSlow {
   from {
     transform: rotate(0deg);
@@ -12,3 +17,4 @@
 .animate-spin-slow {
   animation: spinSlow 18s linear infinite;
 }
+

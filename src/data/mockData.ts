@@ -1,17 +1,18 @@
 import { CategoryCardInfo, FriendProfile, MemeItem, CookingItem, EventItem, GroupItem, GymItem } from '../types';
 
+export const CARACTERISTICAS_CATEGORY: CategoryCardInfo = {
+  key: 'caracteristicas',
+  title: 'Características',
+  subtitle: 'Afinidad & Pasiones',
+  badge: '4K • ULTRA HD',
+  image: '/abc.png',
+  countLabel: 'DEPORTES • MUSICA • JUEGOS & MÁS',
+  color: 'from-sky-500 to-indigo-600',
+  iconName: 'Sparkles',
+  description: 'Filtra y conecta por DEPORTES, MUSICA, GIMNASIO, VIDEOJUEGOS, NATURALEZA, INFORMATICA y MEMES.'
+};
+
 export const CATEGORIES_DATA: CategoryCardInfo[] = [
-  {
-    key: 'caracteristicas',
-    title: 'Características',
-    subtitle: 'Afinidad & Pasiones',
-    badge: '4K • ULTRA HD',
-    image: '/abc.png',
-    countLabel: 'DEPORTES • MUSICA • JUEGOS & MÁS',
-    color: 'from-sky-500 to-indigo-600',
-    iconName: 'Sparkles',
-    description: 'Filtra y conecta por DEPORTES, MUSICA, GIMNASIO, VIDEOJUEGOS, NATURALEZA, INFORMATICA y MEMES.'
-  },
   {
     key: 'memes',
     title: 'Memes',

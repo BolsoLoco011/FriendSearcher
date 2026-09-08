@@ -230,12 +230,12 @@ export const AuthWall: React.FC<AuthWallProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-sky-50/30 to-slate-100 flex flex-col justify-center items-center p-4 sm:p-6 select-none">
+    <div className="min-h-screen bg-sky-200 flex flex-col justify-center items-center p-4 sm:p-6 select-none">
       
       {/* Brand Top Pill */}
       <div className="mb-6 text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-sky-200 text-sky-700 text-xs font-bold shadow-xs">
-          <Lock className="w-3.5 h-3.5 text-sky-500" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-100 border border-sky-400 text-sky-950 text-xs font-black shadow-xs">
+          <Lock className="w-3.5 h-3.5 text-sky-600" />
           <span>Acceso Privado & Registro Requerido</span>
         </div>
       </div>
@@ -243,30 +243,30 @@ export const AuthWall: React.FC<AuthWallProps> = ({
       {/* Main Authentication Card */}
       <div 
         id="auth-wall-card"
-        className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl shadow-xl overflow-hidden"
+        className="w-full max-w-md bg-sky-50 border-2 border-sky-300 rounded-3xl shadow-2xl shadow-sky-300/60 overflow-hidden"
       >
         {/* Card Header Banner */}
-        <div className="p-6 sm:p-8 bg-gradient-to-b from-sky-50/50 to-white border-b border-slate-100 text-center">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-sky-500 text-white flex items-center justify-center shadow-lg shadow-sky-200 mb-4">
+        <div className="p-6 sm:p-8 bg-sky-100 border-b border-sky-200 text-center">
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-sky-500 text-white flex items-center justify-center shadow-lg shadow-sky-300 mb-4">
             <Sparkles className="w-7 h-7" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-sky-950 tracking-tight">
             Bienvenido a FriendSearcher
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1.5 max-w-xs mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-sky-800 mt-1.5 max-w-xs mx-auto leading-relaxed font-medium">
             Para ver la página, perfiles reales y actividades, debes registrarte o iniciar sesión.
           </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex border-b border-slate-100 bg-slate-50/60 p-1.5 mx-6 mt-5 rounded-2xl border">
+        <div className="flex border-b border-sky-200 bg-sky-200/80 p-1.5 mx-6 mt-5 rounded-2xl border">
           <button
             type="button"
             onClick={() => { setTab('register'); setErrorMsg(null); }}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               tab === 'register'
-                ? 'bg-white text-sky-700 shadow-xs border border-slate-200/60'
-                : 'text-slate-500 hover:text-slate-800'
+                ? 'bg-sky-500 text-white shadow-xs'
+                : 'text-sky-900 hover:text-sky-950'
             }`}
           >
             <UserPlus className="w-3.5 h-3.5" />
@@ -278,8 +278,8 @@ export const AuthWall: React.FC<AuthWallProps> = ({
             onClick={() => { setTab('login'); setErrorMsg(null); }}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               tab === 'login'
-                ? 'bg-white text-sky-700 shadow-xs border border-slate-200/60'
-                : 'text-slate-500 hover:text-slate-800'
+                ? 'bg-sky-500 text-white shadow-xs'
+                : 'text-sky-900 hover:text-sky-950'
             }`}
           >
             <LogIn className="w-3.5 h-3.5" />
