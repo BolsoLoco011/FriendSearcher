@@ -16,7 +16,8 @@ import {
   Trash2, 
   Loader2,
   Edit3,
-  Dumbbell
+  Dumbbell,
+  Gamepad2
 } from 'lucide-react';
 import { FriendProfile, CategoryKey } from '../types';
 import { calculateCompatibility } from '../utils/compatibility';
@@ -77,6 +78,15 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
           }) ||
           friend.joinedGroup?.toLowerCase().includes('futbol') ||
           friend.joinedEvent?.toLowerCase().includes('futbol')
+        )) ||
+        (selectedCategory === 'juegos' && (
+          friend.traits.some(t => {
+            const n = t.toLowerCase();
+            return n.includes('juego') || n.includes('videojuego') || n.includes('gamer') || n.includes('gaming') || n.includes('corona');
+          }) ||
+          friend.occupation?.toLowerCase().includes('gamer') ||
+          friend.joinedGroup?.toLowerCase().includes('gaming') ||
+          friend.joinedGroup?.toLowerCase().includes('juegos')
         ));
       if (!catMatch) return false;
     }
@@ -261,6 +271,18 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
             Gimnasio
           </button>
 
+          <button
+            onClick={() => onSelectCategory('juegos')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              selectedCategory === 'juegos'
+                ? 'bg-violet-600 text-white font-bold shadow-xs'
+                : 'bg-sky-200/80 text-sky-900 hover:bg-sky-300 border border-sky-300'
+            }`}
+          >
+            <Gamepad2 className="w-3 h-3 text-violet-700" />
+            Juegos
+          </button>
+
           {activeTraitFilter && (
             <div className="ml-auto flex items-center gap-2 bg-sky-200 border border-sky-400 text-sky-950 px-3 py-1 rounded-full text-xs font-bold">
               <span>Rasgo: {activeTraitFilter}</span>
@@ -316,7 +338,7 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
                       src={friend.avatar}
                       alt={friend.name}
                       referrerPolicy="no-referrer"
-                      className="w-16 h-16 rounded-2xl object-cover border-2 border-sky-300 group-hover:border-sky-500 transition-colors shadow-2xs"
+                      className="w-16 h-16 rounded-2xl object-cover border-2 border-sky-300 group-hover:border-sky-500 transition-colors shadow-2xs bg-slate-900"
                     />
                     <span 
                       className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full text-white text-[9px] font-bold shadow-xs bg-sky-600"
@@ -324,6 +346,14 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
                     >
                       {friend.dynamicCompatibility.score}%
                     </span>
+                    {(friend.id === 'f-1' || friend.secondaryAvatar || friend.name.toLowerCase().includes('benja')) && (
+                      <span 
+                        className="absolute -top-1.5 -left-1.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-slate-950 text-white shadow-xs border border-sky-300 flex items-center gap-0.5"
+                        title="Tiene 2 fotos de perfil: Corona Chalk y Gatito"
+                      >
+                        📸 2 fotos
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex-1 min-w-0">

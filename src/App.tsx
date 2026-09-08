@@ -237,6 +237,15 @@ export default function App() {
           deleteDoc(doc(db, 'users', 'f-2')).catch(() => {});
         }
 
+        // Auto-upgrade f-1 in Firestore if it still has Bruno or needs Benja data
+        const f1Doc = list.find(d => d.id === 'f-1');
+        if (f1Doc && (f1Doc.name.toLowerCase().includes('bruno') || f1Doc.avatar.includes('bruno') || !f1Doc.secondaryAvatar)) {
+          const benjaData = INITIAL_FRIENDS.find(f => f.id === 'f-1');
+          if (benjaData) {
+            setDoc(doc(db, 'users', 'f-1'), benjaData, { merge: true }).catch(() => {});
+          }
+        }
+
         // Ensure predefined initial profiles from code exist in Firestore if not already present
         INITIAL_FRIENDS.forEach(f => {
           const exists = list.some(p => p.id === f.id);
@@ -708,7 +717,7 @@ export default function App() {
             </h1>
 
             <p className="mt-2.5 text-xs sm:text-sm text-sky-800 leading-relaxed">
-              Explora los <strong>5 cuadrados</strong> de memes, cocina, eventos, grupos y gimnasio. Descubre afinidad en <strong>CARACTERISTICAS</strong> (arriba a la izquierda).
+              Explora los <strong>6 cuadrados</strong> de memes, cocina, eventos, grupos, gimnasio y juegos. Descubre afinidad en <strong>CARACTERISTICAS</strong> (arriba a la izquierda).
             </p>
 
             <div className="flex flex-wrap items-center gap-3 mt-5 justify-center sm:justify-start text-xs">
@@ -736,7 +745,7 @@ export default function App() {
               <Compass className="w-6 h-6 animate-spin-slow" />
             </div>
             <span className="text-xs font-bold text-sky-800">Explorador Rápido</span>
-            <span className="text-base font-black text-sky-950 mt-0.5">5 Cuadrados 4K HD</span>
+            <span className="text-base font-black text-sky-950 mt-0.5">6 Cuadrados 4K HD</span>
             <p className="text-[11px] text-sky-700 mt-1 leading-snug">
               Toca un cuadrado para filtrar el feed o ver contenido exclusivo.
             </p>
@@ -744,7 +753,7 @@ export default function App() {
 
         </div>
 
-        {/* 1. LOS 5 CUADRADOS 4K HD DE: MEMES, COCINA, EVENTOS, GRUPOS Y GIMNASIO */}
+        {/* 1. LOS 6 CUADRADOS 4K HD DE: MEMES, COCINA, EVENTOS, GRUPOS, GIMNASIO Y JUEGOS */}
         <Square4KCards
           categories={CATEGORIES_DATA}
           selectedCategory={selectedCategory}
@@ -783,7 +792,7 @@ export default function App() {
           </div>
 
           <p className="text-sky-800 font-medium">
-            CARACTERISTICAS • Memes • Cocina • Eventos • Grupos • Gimnasio
+            CARACTERISTICAS • Memes • Cocina • Eventos • Grupos • Gimnasio • Juegos
           </p>
 
           <button
@@ -797,7 +806,7 @@ export default function App() {
             }}
             className="text-xs text-sky-700 hover:text-sky-900 font-bold hover:underline cursor-pointer"
           >
-            Restablecer perfil de Bruno Silva a Firestore
+            Sincronizar perfil de Benja a Firestore
           </button>
         </div>
       </footer>

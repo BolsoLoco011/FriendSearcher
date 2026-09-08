@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Filter for chalk / rough brush texture -->
+    <filter id="chalk-texture" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.5" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+
+  <!-- Solid Pitch Black Background -->
+  <rect width="500" height="500" fill="#000000" />
+
+  <!-- Crown Group with Chalk Filter and Slight Dynamic Angle -->
+  <g filter="url(#chalk-texture)" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    
+    <!-- Outer Main Crown Contour - Bold Brush Strokes -->
+    <!-- Starts at left base, goes to left spike, valley 1, center spike, valley 2, right spike, right base -->
+    <path 
+      d="M 122 280 
+         L 142 92 
+         L 194 220 
+         L 288 126 
+         L 326 264 
+         L 426 238 
+         L 374 362" 
+      stroke-width="11" 
+    />
+
+    <!-- Secondary overlapping sketchy stroke for hand-drawn chalk feel -->
+    <path 
+      d="M 126 278 
+         L 140 96 
+         L 196 218 
+         L 286 130 
+         L 324 262 
+         L 422 242 
+         L 372 360" 
+      stroke-width="5" 
+      stroke-opacity="0.85" 
+    />
+
+    <!-- Extra dynamic chalk scratch lines on Left Spike -->
+    <path d="M 130 260 L 144 100" stroke-width="4" stroke-opacity="0.9" />
+    <path d="M 148 108 L 188 210" stroke-width="5" stroke-opacity="0.8" />
+    <path d="M 138 92 L 152 165" stroke-width="3" stroke-opacity="0.7" />
+
+    <!-- Extra dynamic chalk scratch lines on Center Spike -->
+    <path d="M 202 212 L 284 134" stroke-width="5" stroke-opacity="0.85" />
+    <path d="M 284 140 L 320 252" stroke-width="6" stroke-opacity="0.9" />
+    <line x1="288" y1="130" x2="289" y2="230" stroke-width="4" stroke-opacity="0.6" stroke-dasharray="8 6" />
+
+    <!-- Extra dynamic chalk scratch lines on Right Spike -->
+    <path d="M 334 256 L 420 240" stroke-width="5" stroke-opacity="0.85" />
+    <path d="M 424 246 L 376 354" stroke-width="6" stroke-opacity="0.8" />
+    <path d="M 412 250 L 366 330" stroke-width="3" stroke-opacity="0.7" />
+
+    <!-- Interior Base Ellipse (Hollow Oval Opening) -->
+    <!-- Front curved rim of the opening -->
+    <path 
+      d="M 120 282 
+         C 140 330, 240 375, 340 326 
+         C 365 314, 380 292, 360 274
+         C 330 250, 220 220, 150 254
+         C 130 264, 115 272, 120 282 Z" 
+      stroke-width="9" 
+    />
+
+    <!-- Repeated sketchy oval contour for chalk layering -->
+    <path 
+      d="M 124 286 
+         C 146 332, 244 372, 338 324 
+         C 360 312, 376 294, 356 276
+         C 326 254, 224 224, 154 256
+         C 134 266, 120 274, 124 286 Z" 
+      stroke-width="4" 
+      stroke-opacity="0.8" 
+    />
+
+    <!-- Bottom Outer Rim of Crown - Thick curved sweep -->
+    <path 
+      d="M 116 286 
+         C 140 360, 230 422, 330 380 
+         C 356 370, 382 352, 378 340" 
+      stroke-width="12" 
+    />
+
+    <!-- Secondary lower contour for expressive texture -->
+    <path 
+      d="M 120 292 
+         C 144 366, 232 418, 332 376 
+         C 354 366, 376 350, 374 344" 
+      stroke-width="5" 
+      stroke-opacity="0.85" 
+    />
+
+    <path 
+      d="M 132 316 
+         C 160 372, 236 412, 318 382" 
+      stroke-width="4" 
+      stroke-opacity="0.6" 
+    />
+
+    <!-- Chalk Hatching & Detail Marks inside front panel -->
+    <line x1="286" y1="210" x2="290" y2="280" stroke-width="4.5" stroke-opacity="0.75" />
+    <line x1="298" y1="218" x2="304" y2="284" stroke-width="4" stroke-opacity="0.65" />
+    <line x1="210" y1="250" x2="218" y2="300" stroke-width="4" stroke-opacity="0.7" />
+    <line x1="222" y1="258" x2="230" y2="308" stroke-width="3" stroke-opacity="0.6" />
+
+    <!-- Expressive Chalk Flecks & Accent Marks -->
+    <circle cx="140" cy="84" r="3" fill="#ffffff" stroke="none" />
+    <circle cx="292" cy="116" r="3.5" fill="#ffffff" stroke="none" />
+    <circle cx="432" cy="232" r="3" fill="#ffffff" stroke="none" />
+    <line x1="136" y1="80" x2="148" y2="92" stroke-width="3" stroke-opacity="0.7" />
+    <line x1="282" y1="112" x2="298" y2="124" stroke-width="3.5" stroke-opacity="0.7" />
+    <line x1="424" y1="228" x2="436" y2="242" stroke-width="3" stroke-opacity="0.7" />
+  </g>
+</svg>

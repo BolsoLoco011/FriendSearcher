@@ -161,7 +161,7 @@ export const OnboardingProfileModal: React.FC<OnboardingProfileModalProps> = ({
         city: city.trim(),
         occupation: occupation.trim() || 'Miembro de la comunidad',
         bio: bio.trim() || `¡Hola! Me uní a FriendSearcher para conocer gente con gustos similares. Me encanta ${favoriteFood} y los ${favoriteMemeStyle}.`,
-        avatar: avatar.trim() || currentUser.photoURL || '/bruno.png',
+        avatar: avatar.trim() || currentUser.photoURL || '/benja.svg',
         matchScore: 98,
         highlightCategory: 'caracteristicas',
         traits: selectedTraits.length > 0 ? selectedTraits : ['AMISTAD', 'BUENA ONDA'],

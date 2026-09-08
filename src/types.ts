@@ -1,4 +1,4 @@
-export type CategoryKey = 'caracteristicas' | 'memes' | 'cocina' | 'eventos' | 'grupos' | 'gimnasio';
+export type CategoryKey = 'caracteristicas' | 'memes' | 'cocina' | 'eventos' | 'grupos' | 'gimnasio' | 'juegos';
 
 export interface CategoryCardInfo {
   key: CategoryKey;
@@ -17,6 +17,7 @@ export interface FriendProfile {
   name: string;
   age: number;
   avatar: string;
+  secondaryAvatar?: string;
   city: string;
   occupation: string;
   bio: string;

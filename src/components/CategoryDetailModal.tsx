@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { CategoryCardInfo, CategoryKey, MemeItem, CookingItem, EventItem, GroupItem, FriendProfile, GymItem } from '../types';
 import { calculateCompatibility } from '../utils/compatibility';
+import { GamesSection } from './GamesSection';
 
 interface CategoryDetailModalProps {
   category: CategoryCardInfo | null;
@@ -69,7 +70,7 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
       <div 
-        className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-auto"
+        className={`relative w-full ${category.key === 'juegos' ? 'max-w-5xl' : 'max-w-4xl'} bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-auto`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with 4K Banner */}
@@ -718,6 +719,15 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
                 </div>
               </div>
             </div>
+          )}
+
+          {/* 6. JUEGOS & MINIVIDEOJUEGOS (TA TE TI) */}
+          {category.key === 'juegos' && (
+            <GamesSection
+              friends={friends}
+              onOpenFriendDetail={onOpenFriendDetail}
+              currentUserProfile={currentUserProfile}
+            />
           )}
 
         </div>

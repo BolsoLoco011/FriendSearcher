@@ -67,25 +67,37 @@ export const CATEGORIES_DATA: CategoryCardInfo[] = [
     color: 'from-rose-500 to-red-600',
     iconName: 'Dumbbell',
     description: 'Encuentra compañeros de entrenamiento, comparte rutinas de pesas, calistenia, crossfit o planes de superación física y vida saludable.'
+  },
+  {
+    key: 'juegos',
+    title: 'Juegos',
+    subtitle: 'Minivideojuegos & Arcade',
+    badge: '4K • ULTRA HD',
+    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=85',
+    countLabel: 'Minijuego Activo: Ta-Te-Ti',
+    color: 'from-violet-600 to-fuchsia-600',
+    iconName: 'Gamepad2',
+    description: 'Sala de minivideojuegos arcade y desafíos rápidos para disfrutar con amigos. Juega al clásico Ta Te Ti (3 en línea) contra la máquina con IA o en modo 2 jugadores.'
   }
 ];
 
 export const INITIAL_FRIENDS: FriendProfile[] = [
   {
     id: 'f-1',
-    name: 'Bruno Silva',
+    name: 'Benja',
     age: 24,
-    avatar: '/bruno.png',
+    avatar: '/benja.svg',
+    secondaryAvatar: '/benja-cat.svg',
     city: 'Buenos Aires',
-    occupation: 'Gamer & Futbolero',
-    bio: 'Fanático de los videojuegos y el fútbol, soy tímido al principio pero con mis amigos hablo mucho.',
+    occupation: 'Gamer & Pet Lover',
+    bio: 'Soy Benja. Fanático de los buenos planes, memes de calidad, videojuegos y momentos chill con mi gato.',
     matchScore: 98,
     highlightCategory: 'caracteristicas',
-    traits: ['VIDEOJUEGOS', 'DEPORTES', 'MEMES', 'Amante de milas'],
+    traits: ['CORONA', 'MEMES', 'GATOS', 'DEPORTES', 'Amante de milas'],
     favoriteFood: 'Fideos y Milanesas',
-    favoriteMemeStyle: 'Memes de futbol',
-    joinedEvent: 'Tarde de futbol',
-    joinedGroup: 'Squad Gaming & Futboleros',
+    favoriteMemeStyle: 'Memes de humor absurdo',
+    joinedEvent: 'Tarde de gaming y juntada',
+    joinedGroup: 'Squad Benja & Amigos',
     isConnected: false
   }
 ];
@@ -116,8 +128,8 @@ export const INITIAL_MEMES: MemeItem[] = [
     title: 'Tú y tu mejor amigo juzgando la comida del delivery con cara de expertos',
     imageUrl: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80',
     likes: 890,
-    author: 'Bruno S.',
-    sharedByFriend: 'Bruno Silva',
+    author: 'Benja',
+    sharedByFriend: 'Benja',
     tag: 'Foodie Humor',
     userVoted: false
   },
@@ -139,7 +151,7 @@ export const INITIAL_COOKING: CookingItem[] = [
     title: 'Taller de Pasta Fresca & Salsas Caseras',
     cuisine: 'Italiana Artesanal',
     level: 'Principiante a Medio',
-    hostName: 'Bruno & Amigos',
+    hostName: 'Benja & Amigos',
     imageUrl: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80',
     membersInterested: 18,
     nextGathering: 'Sábado 19:30 hs'
@@ -251,7 +263,7 @@ export const INITIAL_GYM: GymItem[] = [
     title: 'Rutina Push / Pull & Hipertrofia',
     activity: 'Fuerza & Musculación',
     location: 'SmartFit / Gym Central',
-    hostName: 'Bruno Silva',
+    hostName: 'Benja',
     imageUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80',
     membersCount: 14,
     schedule: 'Lunes a Jueves • 19:00 hs',

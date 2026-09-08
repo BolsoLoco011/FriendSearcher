@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Laugh, Utensils, CalendarCheck, Users, Dumbbell, ExternalLink, Filter } from 'lucide-react';
+import { Sparkles, Laugh, Utensils, CalendarCheck, Users, Dumbbell, Gamepad2, ExternalLink, Filter } from 'lucide-react';
 import { CategoryCardInfo, CategoryKey } from '../types';
 
 interface Square4KCardsProps {
@@ -23,6 +23,8 @@ const getCategoryIcon = (iconName: string) => {
       return <Users className="w-5 h-5" />;
     case 'Dumbbell':
       return <Dumbbell className="w-5 h-5" />;
+    case 'Gamepad2':
+      return <Gamepad2 className="w-5 h-5" />;
     default:
       return <Sparkles className="w-5 h-5" />;
   }
@@ -63,8 +65,8 @@ export const Square4KCards: React.FC<Square4KCardsProps> = ({
         </div>
       </div>
 
-      {/* Grid of 5 Square 4K HD Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5">
+      {/* Grid of 6 Square 4K HD Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4 lg:gap-5">
         {categories.map((cat) => {
           const isSelected = selectedCategory === cat.key;
 
@@ -72,7 +74,13 @@ export const Square4KCards: React.FC<Square4KCardsProps> = ({
             <div
               key={cat.key}
               id={`square-4k-${cat.key}`}
-              onClick={() => onSelectCategory(isSelected ? 'all' : cat.key)}
+              onClick={() => {
+                if (cat.key === 'juegos') {
+                  onOpenCategoryDetail('juegos');
+                } else {
+                  onSelectCategory(isSelected ? 'all' : cat.key);
+                }
+              }}
               className={`group relative aspect-square rounded-2xl sm:rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 select-none bg-sky-100 ${
                 isSelected
                   ? 'border-4 border-sky-500 shadow-xl shadow-sky-300 ring-4 ring-sky-300 scale-[1.03]'
@@ -123,7 +131,7 @@ export const Square4KCards: React.FC<Square4KCardsProps> = ({
                 {/* Direct Action: Open Detail Explorer */}
                 <div className="mt-2 pt-2 border-t border-white/20 flex items-center justify-between opacity-90 group-hover:opacity-100 transition-opacity">
                   <span className="text-[10px] text-slate-200 font-medium">
-                    {isSelected ? 'Click para quitar' : 'Filtrar feed'}
+                    {cat.key === 'juegos' ? '🕹️ Entrar a jugar' : isSelected ? 'Click para quitar' : 'Filtrar feed'}
                   </span>
                   <button
                     type="button"

@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient for Bedroom Closet Doors -->
+    <linearGradient id="closet-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#b8bec5" />
+      <stop offset="50%" stop-color="#d0d5db" />
+      <stop offset="100%" stop-color="#bcc2c9" />
+    </linearGradient>
+
+    <!-- Quilt Pattern Colors -->
+    <pattern id="quilt-trucks" width="80" height="80" patternUnits="userSpaceOnUse">
+      <rect width="80" height="80" fill="#2d558a" />
+      <!-- Orange tractor patch -->
+      <rect x="0" y="0" width="40" height="40" fill="#d95324" />
+      <rect x="8" y="14" width="22" height="14" rx="2" fill="#f8b032" />
+      <circle cx="12" cy="30" r="5" fill="#333333" />
+      <circle cx="26" cy="30" r="5" fill="#333333" />
+      <!-- Green crane patch -->
+      <rect x="40" y="0" width="40" height="40" fill="#2a8052" />
+      <line x1="45" y1="32" x2="68" y2="10" stroke="#f4d03f" stroke-width="3" />
+      <circle cx="50" cy="32" r="4" fill="#222222" />
+      <circle cx="68" cy="32" r="4" fill="#222222" />
+      <!-- Cyan truck patch -->
+      <rect x="0" y="40" width="40" height="40" fill="#1b85b8" />
+      <rect x="6" y="52" width="24" height="16" fill="#ffffff" rx="2" opacity="0.8" />
+      <!-- Dark blue patch -->
+      <rect x="40" y="40" width="40" height="40" fill="#3b3a6b" />
+      <rect x="48" y="50" width="22" height="15" fill="#f37735" rx="3" />
+    </pattern>
+
+    <!-- Tabby Fur Gradient -->
+    <linearGradient id="tabby-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#544c45" />
+      <stop offset="50%" stop-color="#73685f" />
+      <stop offset="100%" stop-color="#3d3731" />
+    </linearGradient>
+  </defs>
+
+  <!-- Bedroom Closet Background -->
+  <rect width="500" height="230" fill="url(#closet-grad)" />
+  <!-- Closet Door Dividing Line -->
+  <line x1="210" y1="0" x2="210" y2="230" stroke="#8c939c" stroke-width="3" />
+  <!-- Door Handles -->
+  <rect x="180" y="125" width="25" height="5" rx="2.5" fill="#717882" />
+  <rect x="215" y="125" width="25" height="5" rx="2.5" fill="#717882" />
+
+  <!-- Calendar on Left Door -->
+  <rect x="40" y="45" width="60" height="75" rx="3" fill="#ffffff" stroke="#9aa0a8" stroke-width="1.5" />
+  <rect x="40" y="45" width="60" height="16" fill="#38a169" />
+  <circle cx="70" cy="53" r="2" fill="#ffffff" />
+  <g fill="#a0aec0">
+    <rect x="48" y="68" width="8" height="4" rx="1" />
+    <rect x="60" y="68" width="8" height="4" rx="1" />
+    <rect x="72" y="68" width="8" height="4" rx="1" />
+    <rect x="84" y="68" width="8" height="4" rx="1" />
+    <rect x="48" y="78" width="8" height="4" rx="1" />
+    <rect x="60" y="78" width="8" height="4" rx="1" />
+    <rect x="72" y="78" width="8" height="4" rx="1" />
+    <rect x="84" y="78" width="8" height="4" rx="1" />
+  </g>
+
+  <!-- Circular Red "No Turtle" Sign on Right Door -->
+  <g transform="translate(340, 48)">
+    <circle cx="35" cy="35" r="32" fill="#ffffff" stroke="#c53030" stroke-width="7" />
+    <line x1="12" y1="12" x2="58" y2="58" stroke="#c53030" stroke-width="7" />
+    <!-- Turtle Shell silhouette inside -->
+    <ellipse cx="35" cy="35" rx="16" ry="12" fill="#2d3748" />
+    <circle cx="20" cy="35" r="4" fill="#2d3748" />
+    <circle cx="48" cy="35" r="3" fill="#2d3748" />
+  </g>
+
+  <!-- The Bed / Duvet Surface with construction vehicle pattern -->
+  <path d="M 0 200 Q 250 180 500 200 L 500 500 L 0 500 Z" fill="url(#quilt-trucks)" />
+  
+  <!-- Quilt folds and shading -->
+  <path d="M 0 200 Q 220 220 500 195 L 500 230 Q 240 245 0 230 Z" fill="#000000" opacity="0.18" />
+
+  <!-- Tabby Cat (Benja's Michi) curled up on the bed facing the door -->
+  <g id="tabby-cat">
+    <!-- Cat Shadow on Bed -->
+    <ellipse cx="235" cy="315" rx="90" ry="42" fill="#000000" opacity="0.32" />
+
+    <!-- Cat Body Oval -->
+    <ellipse cx="225" cy="275" rx="78" ry="52" fill="url(#tabby-grad)" />
+
+    <!-- Tabby Stripes on Back -->
+    <path d="M 175 255 Q 210 270 250 255" stroke="#26211c" stroke-width="5" fill="none" stroke-linecap="round" />
+    <path d="M 185 272 Q 220 286 260 272" stroke="#26211c" stroke-width="5" fill="none" stroke-linecap="round" />
+    <path d="M 195 290 Q 225 302 265 290" stroke="#26211c" stroke-width="5" fill="none" stroke-linecap="round" />
+    <path d="M 215 305 Q 235 314 260 306" stroke="#26211c" stroke-width="4" fill="none" stroke-linecap="round" />
+
+    <!-- Cat Head (turned away towards door) -->
+    <circle cx="265" cy="215" r="26" fill="#665b53" />
+    <!-- Cat Ears -->
+    <polygon points="250,195 244,175 260,188" fill="#544c45" stroke="#26211c" stroke-width="1.5" />
+    <polygon points="274,188 288,174 282,196" fill="#544c45" stroke="#26211c" stroke-width="1.5" />
+    <!-- Inner ear pink hints -->
+    <polygon points="248,192 246,180 256,188" fill="#d99b9b" opacity="0.6" />
+    <!-- Collar (dark band around neck) -->
+    <path d="M 245 234 Q 262 240 280 232" stroke="#1a1a1a" stroke-width="4.5" fill="none" stroke-linecap="round" />
+
+    <!-- White Paw tucked in with pink beans -->
+    <g transform="translate(245, 275)">
+      <ellipse cx="0" cy="0" rx="14" ry="10" fill="#f7fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <circle cx="-3" cy="-1" r="3" fill="#f687b3" />
+      <circle cx="3" cy="-3" r="2" fill="#f687b3" />
+      <circle cx="5" cy="1" r="2" fill="#f687b3" />
+    </g>
+
+    <!-- Cat Curled Tail with black rings and tip -->
+    <path d="M 155 285 Q 125 320 185 325 Q 220 326 250 305" 
+          stroke="#544c45" stroke-width="16" fill="none" stroke-linecap="round" />
+    <path d="M 150 290 L 160 300" stroke="#26211c" stroke-width="4" />
+    <path d="M 165 312 L 175 320" stroke="#26211c" stroke-width="4" />
+    <path d="M 195 322 L 205 322" stroke="#26211c" stroke-width="4" />
+    <!-- Tail Tip -->
+    <circle cx="250" cy="305" r="7" fill="#26211c" />
+  </g>
+
+  <!-- Human Leg & Foot resting in foreground (Right side) -->
+  <g id="foreground-leg">
+    <!-- Leg path -->
+    <path d="M 430 500 C 420 440, 390 380, 370 340 C 355 310, 340 305, 335 320 C 330 338, 320 370, 305 385 C 290 400, 275 405, 275 415 C 275 425, 310 435, 360 450 C 400 462, 450 500, 450 500 Z" 
+          fill="#f4d3bf" stroke="#dcb49e" stroke-width="2" />
+    <!-- Ankle and heel contour -->
+    <path d="M 335 320 C 342 345, 338 370, 310 395" fill="none" stroke="#cf9e86" stroke-width="2" opacity="0.6" />
+  </g>
+
+  <!-- Comic book / Magazine "ISLA DE LOS TORRENTES" at bottom left -->
+  <g transform="translate(10, 420) rotate(-5)">
+    <rect width="180" height="90" rx="4" fill="#e2e8f0" stroke="#a0aec0" stroke-width="1.5" />
+    <rect x="8" y="12" width="164" height="24" rx="2" fill="#ecc94b" />
+    <text x="14" y="28" font-family="sans-serif" font-size="10" font-weight="bold" fill="#744210" letter-spacing="1">ISLA DE LOS TORRENTES</text>
+    <line x1="8" y1="42" x2="172" y2="42" stroke="#cbd5e0" stroke-width="2" />
+    <line x1="8" y1="52" x2="140" y2="52" stroke="#cbd5e0" stroke-width="2" />
+    <line x1="8" y1="62" x2="160" y2="62" stroke="#cbd5e0" stroke-width="2" />
+  </g>
+</svg>
