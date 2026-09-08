@@ -1,0 +1,6 @@
+{
+  "name": "FriendSearcher",
+  "description": "Encuentra amigos con afinidad real mediante características, memes, cocina, eventos, grupos temáticos y gimnasio en una interfaz web moderna.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

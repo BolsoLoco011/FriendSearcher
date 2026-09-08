@@ -1,0 +1,213 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Profile information of a user or friend",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "age": { "type": "number" },
+        "avatar": { "type": "string" },
+        "city": { "type": "string" },
+        "occupation": { "type": "string" },
+        "bio": { "type": "string" },
+        "matchScore": { "type": "number" },
+        "highlightCategory": { "type": "string" },
+        "traits": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "favoriteFood": { "type": "string" },
+        "favoriteMemeStyle": { "type": "string" },
+        "joinedEvent": { "type": "string" },
+        "joinedGroup": { "type": "string" },
+        "role": { "type": "string" },
+        "isAdmin": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "avatar"]
+    },
+    "Meme": {
+      "title": "Meme Item",
+      "description": "Meme shared by users",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "creatorName": { "type": "string" },
+        "creatorId": { "type": "string" },
+        "upvotes": { "type": "number" },
+        "upvotedBy": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tag": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "title", "imageUrl", "upvotes"]
+    },
+    "Event": {
+      "title": "Event Item",
+      "description": "Community meetup or event",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "location": { "type": "string" },
+        "participantsCount": { "type": "number" },
+        "participants": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "creatorId": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "title", "date", "location"]
+    },
+    "Cooking": {
+      "title": "Cooking Recipe",
+      "description": "Recipe or foodie gathering item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "chef": { "type": "string" },
+        "chefId": { "type": "string" },
+        "dish": { "type": "string" },
+        "recipe": { "type": "string" },
+        "image": { "type": "string" },
+        "likes": { "type": "number" },
+        "likedBy": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "title", "dish"]
+    },
+    "Group": {
+      "title": "Community Group",
+      "description": "Interest or hobby squad",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "membersCount": { "type": "number" },
+        "members": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "image": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "title", "category"]
+    },
+    "Message": {
+      "title": "Chat Message",
+      "description": "Message sent in a chat conversation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "recipientId": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "senderId", "recipientId", "content"]
+    },
+    "AuthorizedEmail": {
+      "title": "Authorized School Email",
+      "description": "Whitelist record of email allowed to register in the school app",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "notes": { "type": "string" },
+        "addedBy": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "email"]
+    },
+    "SchoolSettings": {
+      "title": "School Configuration Settings",
+      "description": "Global settings for school registration restriction and allowed domain",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "enforceWhitelist": { "type": "boolean" },
+        "allowedDomain": { "type": "string" },
+        "schoolName": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "Gym": {
+      "title": "Gym & Fitness Routine",
+      "description": "Workout sessions and gym buddy activities",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "activity": { "type": "string" },
+        "location": { "type": "string" },
+        "hostName": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "membersCount": { "type": "number" },
+        "schedule": { "type": "string" },
+        "isJoined": { "type": "boolean" },
+        "notes": { "type": "string" }
+      },
+      "required": ["id", "title", "activity"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles and friends directory"
+    },
+    "/gym/{gymId}": {
+      "schema": "Gym",
+      "description": "Gym training sessions and routines"
+    },
+    "/authorized_emails/{emailId}": {
+      "schema": "AuthorizedEmail",
+      "description": "Whitelist of school student and faculty emails permitted to register"
+    },
+    "/settings/{settingId}": {
+      "schema": "SchoolSettings",
+      "description": "School security and registration restrictions configuration"
+    },
+    "/memes/{memeId}": {
+      "schema": "Meme",
+      "description": "Shared memes and voting records"
+    },
+    "/events/{eventId}": {
+      "schema": "Event",
+      "description": "Meetup and sports events"
+    },
+    "/cooking/{cookingId}": {
+      "schema": "Cooking",
+      "description": "Cooking recipes and foodie gatherings"
+    },
+    "/groups/{groupId}": {
+      "schema": "Group",
+      "description": "Hobby groups and friend squads"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages exchanged between friends"
+    }
+  }
+}

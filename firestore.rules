@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    match /users/{userId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /memes/{memeId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /events/{eventId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /cooking/{cookingId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /groups/{groupId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /gym/{gymId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /messages/{messageId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /authorized_emails/{emailId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+  }
+}
