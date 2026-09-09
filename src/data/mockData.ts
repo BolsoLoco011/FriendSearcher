@@ -74,10 +74,10 @@ export const CATEGORIES_DATA: CategoryCardInfo[] = [
     subtitle: 'Minivideojuegos & Arcade',
     badge: '4K • ULTRA HD',
     image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=85',
-    countLabel: 'Minijuego Activo: Ta-Te-Ti',
+    countLabel: 'Activos: Snake 1v1 & Ta-Te-Ti',
     color: 'from-violet-600 to-fuchsia-600',
     iconName: 'Gamepad2',
-    description: 'Sala de minivideojuegos arcade y desafíos rápidos para disfrutar con amigos. Juega al clásico Ta Te Ti (3 en línea) contra la máquina con IA o en modo 2 jugadores.'
+    description: 'Sala de minivideojuegos arcade y desafíos rápidos para disfrutar con amigos. Juega al nuevo Snake 1v1 competitivo comiendo manzanas para crecer y atrapar al rival, o al clásico Ta-Te-Ti.'
   }
 ];
 

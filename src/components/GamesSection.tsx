@@ -4,6 +4,8 @@ import {
   Sparkles, Flame, CheckCircle2, ChevronRight, Crown, Smile, Zap, Swords, UserCheck
 } from 'lucide-react';
 import { FriendProfile } from '../types';
+import { Snake1v1Game } from './Snake1v1Game';
+import { RockPaperScissorsGame } from './RockPaperScissorsGame';
 
 interface GamesSectionProps {
   friends?: FriendProfile[];
@@ -122,7 +124,7 @@ export const GamesSection: React.FC<GamesSectionProps> = ({
   onOpenFriendDetail,
   currentUserProfile
 }) => {
-  const [activeTab, setActiveTab] = useState<'tateti' | 'catalog'>('tateti');
+  const [activeTab, setActiveTab] = useState<'tateti' | 'snake' | 'rps' | 'catalog'>('tateti');
   
   // Game Setup
   const [mode, setMode] = useState<GameMode>('benja');
@@ -309,87 +311,274 @@ export const GamesSection: React.FC<GamesSectionProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Top Banner & Minigame Navigator */}
-      <div className="bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-700 text-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
-        {/* Background decorative arcade circles */}
-        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-xl pointer-events-none" />
-        <div className="absolute left-1/3 -top-10 w-32 h-32 rounded-full bg-violet-400/20 blur-lg pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* Prominent Game Selector Hub */}
+      <div className="bg-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-xl border border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-xs font-bold mb-2">
-              <Gamepad2 className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
-              <span>ZONA DE MINIVIDEOJUEGOS ARCADE</span>
-              <span className="text-violet-200">•</span>
-              <span className="text-yellow-300 font-extrabold">TA-TE-TI EN VIVO</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-300 text-xs font-bold mb-2">
+              <Gamepad2 className="w-3.5 h-3.5 text-yellow-400 animate-pulse" />
+              <span>SALA DE MINIVIDEOJUEGOS ARCADE</span>
+              <span className="text-slate-500">•</span>
+              <span className="text-emerald-400 font-extrabold">3 JUEGOS DISPONIBLES</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-2.5">
-              <span>Minijuegos con Amigos</span>
-              <span className="text-xs bg-yellow-400 text-violet-950 font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                100% Interactivo
-              </span>
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-3">
+              <span>Elige tu Minijuego</span>
             </h2>
-            <p className="text-violet-100 text-xs sm:text-sm mt-1 max-w-xl">
-              Disfruta de partidas rápidas, desafía a la máquina, juega en pareja o rétate contra la personalidad de Benja.
+            <p className="text-slate-400 text-xs sm:text-sm mt-1">
+              Ta-Te-Ti, Snake 1v1 y Piedra Papel Tijera están listos para jugar contra la máquina, Benja o en pareja.
             </p>
           </div>
 
-          {/* Sound & Reset controls */}
-          <div className="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+          {/* Sound toggle & quick actions */}
+          <div className="flex items-center gap-2 self-start sm:self-auto">
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               title={soundEnabled ? 'Silenciar efectos' : 'Activar efectos'}
-              className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
+              className={`px-3.5 py-2 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
                 soundEnabled 
-                  ? 'bg-white/20 hover:bg-white/30 border-white/30 text-white' 
-                  : 'bg-black/30 border-white/10 text-white/60'
+                  ? 'bg-emerald-500/20 hover:bg-emerald-500/30 border-emerald-500/40 text-emerald-300' 
+                  : 'bg-slate-800 border-slate-700 text-slate-400'
               }`}
             >
-              {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-300" /> : <VolumeX className="w-4 h-4 text-rose-300" />}
-              <span className="hidden sm:inline">{soundEnabled ? 'Sonido' : 'Mudo'}</span>
+              {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4 text-rose-400" />}
+              <span>{soundEnabled ? 'Sonido Activado' : 'Mudo'}</span>
             </button>
 
-            <button
-              onClick={handleResetRound}
-              className="px-3.5 py-2 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-violet-950 font-black text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Nueva Partida</span>
-            </button>
+            {activeTab === 'tateti' && (
+              <button
+                onClick={handleResetRound}
+                className="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-black text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reiniciar Tablero</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Tab switcher: Ta-Te-Ti vs More Minigames */}
-        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-white/15 overflow-x-auto">
+        {/* Big Game Cards Selector: 4 Columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4">
+          {/* Card 1: Ta-Te-Ti */}
           <button
+            type="button"
             onClick={() => setActiveTab('tateti')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
+            className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden ${
               activeTab === 'tateti'
-                ? 'bg-white text-violet-900 shadow-md'
-                : 'bg-white/10 hover:bg-white/20 text-white'
+                ? 'bg-gradient-to-br from-violet-900/60 to-purple-950/80 border-violet-500 shadow-lg shadow-violet-950/50 ring-2 ring-violet-400/40'
+                : 'bg-slate-800/60 hover:bg-slate-800 border-slate-700/80 hover:border-slate-600 opacity-80 hover:opacity-100'
             }`}
           >
-            <Gamepad2 className="w-4 h-4" />
-            <span>Ta-Te-Ti (Tres en Raya)</span>
-            <span className="px-1.5 py-0.2 bg-emerald-500 text-white text-[9px] rounded-full uppercase">Activo</span>
+            <div className="flex items-start justify-between gap-2">
+              <div className="p-2.5 rounded-xl bg-violet-600 text-white shadow-md">
+                <Crown className="w-5 h-5" />
+              </div>
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                activeTab === 'tateti' 
+                  ? 'bg-violet-400 text-violet-950' 
+                  : 'bg-slate-700 text-slate-300'
+              }`}>
+                {activeTab === 'tateti' ? '● Jugando' : 'Jugar Ta-Te-Ti'}
+              </span>
+            </div>
+            <div className="mt-3">
+              <div className="text-base font-black text-white flex items-center gap-1.5">
+                <span>Ta-Te-Ti</span>
+              </div>
+              <p className="text-xs text-slate-300 mt-1 line-clamp-2">
+                Estrategia 3x3 clásica, Benja frases o 2 jugadores local.
+              </p>
+            </div>
           </button>
 
+          {/* Card 2: Snake 1v1 */}
           <button
-            onClick={() => setActiveTab('catalog')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              activeTab === 'catalog'
-                ? 'bg-white text-violet-900 shadow-md'
-                : 'bg-white/10 hover:bg-white/20 text-white'
+            type="button"
+            onClick={() => setActiveTab('snake')}
+            className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden ${
+              activeTab === 'snake'
+                ? 'bg-gradient-to-br from-emerald-950/80 to-teal-950/90 border-emerald-500 shadow-lg shadow-emerald-950/50 ring-2 ring-emerald-400/40'
+                : 'bg-slate-800/60 hover:bg-slate-800 border-slate-700/80 hover:border-slate-600 opacity-80 hover:opacity-100'
             }`}
           >
-            <Sparkles className="w-4 h-4" />
-            <span>Catálogo de Minijuegos</span>
-            <span className="px-1.5 py-0.2 bg-white/20 text-white text-[9px] rounded-full">Próximamente</span>
+            <div className="flex items-start justify-between gap-2">
+              <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow-md">
+                <Swords className="w-5 h-5" />
+              </div>
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                activeTab === 'snake' 
+                  ? 'bg-emerald-400 text-emerald-950' 
+                  : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+              }`}>
+                {activeTab === 'snake' ? '● Jugando' : 'Jugar Snake'}
+              </span>
+            </div>
+            <div className="mt-3">
+              <div className="text-base font-black text-white flex items-center gap-1.5">
+                <span>Snake 1v1</span>
+              </div>
+              <p className="text-xs text-slate-300 mt-1 line-clamp-2">
+                Come manzanas 🍎 para atrapar al rival si eres más grande.
+              </p>
+            </div>
+          </button>
+
+          {/* Card 3: Piedra Papel Tijera */}
+          <button
+            type="button"
+            onClick={() => setActiveTab('rps')}
+            className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden ${
+              activeTab === 'rps'
+                ? 'bg-gradient-to-br from-rose-950/80 to-pink-950/90 border-rose-500 shadow-lg shadow-rose-950/50 ring-2 ring-rose-400/40'
+                : 'bg-slate-800/60 hover:bg-slate-800 border-slate-700/80 hover:border-slate-600 opacity-80 hover:opacity-100'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="p-2.5 rounded-xl bg-rose-600 text-white shadow-md">
+                <span className="text-lg leading-none">✂️</span>
+              </div>
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                activeTab === 'rps' 
+                  ? 'bg-rose-400 text-rose-950' 
+                  : 'bg-yellow-400 text-slate-950'
+              }`}>
+                {activeTab === 'rps' ? '● Jugando' : '¡Nuevo! Jugar'}
+              </span>
+            </div>
+            <div className="mt-3">
+              <div className="text-base font-black text-white flex items-center gap-1.5">
+                <span>Piedra Papel Tijera</span>
+              </div>
+              <p className="text-xs text-slate-300 mt-1 line-clamp-2">
+                Reflejos y mente. Modo Benja, IA, 2P y modo Spock 🦎🖖.
+              </p>
+            </div>
+          </button>
+
+          {/* Card 4: Más Juegos */}
+          <button
+            type="button"
+            onClick={() => setActiveTab('catalog')}
+            className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between ${
+              activeTab === 'catalog'
+                ? 'bg-slate-800 border-amber-500 shadow-lg ring-2 ring-amber-400/40'
+                : 'bg-slate-800/40 hover:bg-slate-800 border-slate-700/60 opacity-70 hover:opacity-100'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="p-2.5 rounded-xl bg-amber-600 text-white shadow-md">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-700 text-slate-300 uppercase tracking-wider">
+                Catálogo
+              </span>
+            </div>
+            <div className="mt-3">
+              <div className="text-base font-black text-white">Más Minijuegos</div>
+              <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                Trivia de Afinidades, Memotest y Conecta 4.
+              </p>
+            </div>
           </button>
         </div>
       </div>
 
-      {activeTab === 'tateti' ? (
+      {/* Switcher Quick Notification Banner */}
+      {activeTab === 'tateti' && (
+        <div className="bg-gradient-to-r from-rose-500/10 via-amber-500/10 to-transparent border border-rose-500/30 rounded-2xl p-3.5 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-slate-800">
+          <div className="flex items-center gap-2">
+            <span className="text-lg leading-none">✂️</span>
+            <span>
+              <strong>¡Nuevo juego listo!</strong> Juega al clásico <strong>Piedra, Papel o Tijera</strong> (con modo Spock 🖖 y Benja).
+            </span>
+          </div>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              onClick={() => setActiveTab('rps')}
+              className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <span>Piedra Papel Tijera</span>
+              <ChevronRight className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => setActiveTab('snake')}
+              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Swords className="w-3 h-3" />
+              <span>Snake 1v1</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'snake' && (
+        <div className="bg-gradient-to-r from-violet-500/10 via-rose-500/10 to-transparent border border-violet-500/30 rounded-2xl p-3.5 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-slate-800">
+          <div className="flex items-center gap-2">
+            <span className="text-lg leading-none">👑</span>
+            <span>
+              Puedes alternar fácilmente entre <strong>Ta-Te-Ti</strong> y <strong>Piedra Papel Tijera</strong> en cualquier instante.
+            </span>
+          </div>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              onClick={() => setActiveTab('tateti')}
+              className="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-black text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Crown className="w-3.5 h-3.5" />
+              <span>Ir a Ta-Te-Ti</span>
+              <ChevronRight className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => setActiveTab('rps')}
+              className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <span>Piedra Papel Tijera</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'rps' && (
+        <div className="bg-gradient-to-r from-violet-500/10 via-emerald-500/10 to-transparent border border-rose-500/30 rounded-2xl p-3.5 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-slate-800">
+          <div className="flex items-center gap-2">
+            <span className="text-lg leading-none">🎮</span>
+            <span>
+              Estás jugando <strong>Piedra, Papel o Tijera</strong>. ¿Quieres jugar a Ta-Te-Ti o Snake 1v1?
+            </span>
+          </div>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              onClick={() => setActiveTab('tateti')}
+              className="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-black text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Crown className="w-3.5 h-3.5" />
+              <span>Ir a Ta-Te-Ti</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('snake')}
+              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Swords className="w-3.5 h-3.5" />
+              <span>Snake 1v1</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'rps' ? (
+        <RockPaperScissorsGame
+          friends={friends}
+          soundEnabled={soundEnabled}
+          onToggleSound={() => setSoundEnabled(!soundEnabled)}
+          onOpenFriendDetail={onOpenFriendDetail}
+        />
+      ) : activeTab === 'snake' ? (
+        <Snake1v1Game
+          friends={friends}
+          soundEnabled={soundEnabled}
+          onToggleSound={() => setSoundEnabled(!soundEnabled)}
+          onOpenFriendDetail={onOpenFriendDetail}
+        />
+      ) : activeTab === 'tateti' ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           {/* Left Column: Game Board & Status */}
@@ -715,17 +904,67 @@ export const GamesSection: React.FC<GamesSectionProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             
-            {/* 1. Ta-Te-Ti (Active) */}
+            {/* 1. Piedra, Papel o Tijera (Active - New) */}
             <div 
-              onClick={() => setActiveTab('tateti')}
-              className="bg-white border-2 border-emerald-500 rounded-3xl p-5 shadow-md flex flex-col justify-between cursor-pointer hover:scale-[1.02] transition-transform"
+              onClick={() => setActiveTab('rps')}
+              className="bg-white border-2 border-rose-500 rounded-3xl p-5 shadow-md flex flex-col justify-between cursor-pointer hover:scale-[1.02] transition-transform ring-2 ring-rose-300"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="p-2.5 rounded-2xl bg-rose-100 text-rose-700 font-bold text-xl flex items-center justify-center">
+                    ✂️
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-yellow-400 text-slate-950 text-[10px] font-black uppercase">
+                    ¡Nuevo & Jugable!
+                  </span>
+                </div>
+                <h4 className="text-base font-black text-slate-900">Piedra, Papel o Tijera</h4>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Duelo de reflejos y mente. Modo vs Benja, IA con 3 niveles, 2 Jugadores local y modo extendido Sheldon Cooper (Lagarto 🦎 y Spock 🖖).
+                </p>
+              </div>
+              <button className="mt-4 w-full py-2 rounded-xl bg-rose-600 text-white text-xs font-black shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>Jugar Piedra Papel Tijera</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* 2. Snake 1v1 (Active) */}
+            <div 
+              onClick={() => setActiveTab('snake')}
+              className="bg-white border-2 border-emerald-500 rounded-3xl p-5 shadow-md flex flex-col justify-between cursor-pointer hover:scale-[1.02] transition-transform ring-2 ring-emerald-300"
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="p-2.5 rounded-2xl bg-emerald-100 text-emerald-700 font-bold">
+                    <Swords className="w-6 h-6" />
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-yellow-400 text-slate-950 text-[10px] font-black uppercase">
+                    ¡Nuevo & Jugable!
+                  </span>
+                </div>
+                <h4 className="text-base font-black text-slate-900">Snake 1v1: Duelo de Manzanas</h4>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Come manzanas rojas para crecer y atrapar al rival. Solo puedes atraparlo si tu serpiente es más grande que la otra. ¡Duelos tácticos con Benja o IA!
+                </p>
+              </div>
+              <button className="mt-4 w-full py-2 rounded-xl bg-emerald-600 text-white text-xs font-black shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>Jugar Snake 1v1</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* 2. Ta-Te-Ti (Active) */}
+            <div 
+              onClick={() => setActiveTab('tateti')}
+              className="bg-white border-2 border-violet-500 rounded-3xl p-5 shadow-md flex flex-col justify-between cursor-pointer hover:scale-[1.02] transition-transform"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="p-2.5 rounded-2xl bg-violet-100 text-violet-700 font-bold">
                     <Crown className="w-6 h-6" />
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-black uppercase">
+                  <span className="px-2.5 py-0.5 rounded-full bg-violet-600 text-white text-[10px] font-black uppercase">
                     ¡Jugable Ahora!
                   </span>
                 </div>
@@ -734,8 +973,8 @@ export const GamesSection: React.FC<GamesSectionProps> = ({
                   El clásico juego de estrategia rápida. Juega contra la IA invicta, reta a Benja con frases o juega en modo 2 jugadores local.
                 </p>
               </div>
-              <button className="mt-4 w-full py-2 rounded-xl bg-emerald-600 text-white text-xs font-black shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
-                <span>Jugar ahora</span>
+              <button className="mt-4 w-full py-2 rounded-xl bg-violet-600 text-white text-xs font-black shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>Jugar Ta-Te-Ti</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
