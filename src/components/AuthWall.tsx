@@ -13,7 +13,6 @@ import {
   googleProvider, 
   microsoftProvider,
   signInWithPopup, 
-  signInAnonymously, 
   signOut
 } from '../firebase';
 import { AuthorizedEmail, SchoolSettings } from '../types';
@@ -88,21 +87,6 @@ export const AuthWall: React.FC<AuthWallProps> = ({
       } else {
         setErrorMsg('No se pudo iniciar con Google. Intenta con tu cuenta escolar de Microsoft.');
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Sign in anonymously (Quick guest demo)
-  const handleAnonymousSignIn = async () => {
-    setLoading(true);
-    setErrorMsg(null);
-    try {
-      await signInAnonymously(auth);
-      onSuccess?.();
-    } catch (err: unknown) {
-      console.error('Anonymous error:', err);
-      setErrorMsg('Error al ingresar como invitado.');
     } finally {
       setLoading(false);
     }
@@ -198,19 +182,6 @@ export const AuthWall: React.FC<AuthWallProps> = ({
               </>
             )}
           </button>
-
-          {/* Guest / Demo Option */}
-          <div className="pt-2 text-center">
-            <button
-              type="button"
-              onClick={handleAnonymousSignIn}
-              disabled={loading}
-              className="text-xs text-sky-800 hover:text-sky-950 font-semibold underline underline-offset-4 cursor-pointer inline-flex items-center gap-1.5 transition-all"
-            >
-              <UserIcon className="w-3.5 h-3.5" />
-              <span>Modo invitado temporal (Demo)</span>
-            </button>
-          </div>
 
           {/* Trust badge */}
           <div className="mt-6 pt-4 border-t border-sky-200/60 flex items-center justify-center gap-1.5 text-[11px] text-sky-800 font-medium">

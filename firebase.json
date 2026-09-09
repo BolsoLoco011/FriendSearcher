@@ -1,0 +1,8 @@
+{
+  "firestore": [
+    {
+      "database": "ai-studio-friendsearcher-ba66d5e3-f9d2-413d-a7b3-bca55c7ee3d1",
+      "rules": "firestore.rules"
+    }
+  ]
+}
