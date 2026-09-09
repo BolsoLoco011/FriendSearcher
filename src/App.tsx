@@ -27,7 +27,7 @@ import {
 } from './data/mockData';
 import { CategoryKey, CategoryCardInfo, FriendProfile, MemeItem, CookingItem, EventItem, GroupItem, GymItem, AuthorizedEmail, SchoolSettings } from './types';
 import { Sparkles, HeartHandshake, Compass, Flame, CloudCheck, ShieldCheck, AlertOctagon, GraduationCap } from 'lucide-react';
-import { isUserAdmin, DEFAULT_ADMIN_EMAIL } from './config/admin';
+import { isUserAdmin, DEFAULT_ADMIN_EMAIL, DEFAULT_SCHOOL_DOMAIN } from './config/admin';
 import { validateSchoolEmail, checkSchoolEmailAuthorizationAsync } from './utils/schoolAuth';
 import { 
   auth, 
@@ -132,12 +132,17 @@ export default function App() {
     // Listen to school configuration policies
     const unsubSettings = onSnapshot(doc(db, 'settings', 'school_config'), (snap) => {
       if (snap.exists()) {
-        setSchoolSettings(snap.data() as SchoolSettings);
+        const data = snap.data() as SchoolSettings;
+        setSchoolSettings({
+          ...data,
+          allowedDomain: data.allowedDomain?.trim() || DEFAULT_SCHOOL_DOMAIN,
+          schoolName: data.schoolName || 'Elbio Fernández'
+        });
       } else {
         const initialSettings: SchoolSettings = {
           enforceWhitelist: true,
-          allowedDomain: '',
-          schoolName: 'Portal Escolar'
+          allowedDomain: DEFAULT_SCHOOL_DOMAIN,
+          schoolName: 'Elbio Fernández'
         };
         setDoc(doc(db, 'settings', 'school_config'), initialSettings, { merge: true }).catch(() => {});
         setSchoolSettings(initialSettings);

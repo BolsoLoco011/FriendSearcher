@@ -2,6 +2,9 @@
 // The primary default admin is defined in code as requested by the user.
 export const DEFAULT_ADMIN_EMAIL = 'juan.manuel.ipar@gmail.com';
 
+// Institutional school domain (all students authenticate with this domain via Microsoft)
+export const DEFAULT_SCHOOL_DOMAIN = 'elbiofernandez.edu.uy';
+
 // Testing environment configuration (friendsearchertesting.ai.studio)
 export const TESTING_DOMAIN = 'friendsearchertesting.ai.studio';
 export const TESTING_ADMIN_EMAIL = 'ipar.fernando@gmail.com';

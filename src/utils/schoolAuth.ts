@@ -1,4 +1,4 @@
-import { DEFAULT_ADMIN_EMAIL, TESTING_ADMIN_EMAIL, isTestingEnvironment } from '../config/admin';
+import { DEFAULT_ADMIN_EMAIL, TESTING_ADMIN_EMAIL, isTestingEnvironment, DEFAULT_SCHOOL_DOMAIN } from '../config/admin';
 import { AuthorizedEmail, SchoolSettings } from '../types';
 import { db, collection, getDocs, doc, getDoc } from '../firebase';
 
@@ -60,9 +60,10 @@ export function validateSchoolEmail(
     };
   }
 
-  // 3. Check allowed domain (e.g. '@escuela.edu') if configured
-  if (settings.allowedDomain && settings.allowedDomain.trim()) {
-    let domainPattern = settings.allowedDomain.toLowerCase().trim();
+  // 3. Check allowed domain (defaults to @elbiofernandez.edu.uy)
+  const configuredDomain = settings.allowedDomain?.trim() || DEFAULT_SCHOOL_DOMAIN;
+  if (configuredDomain) {
+    let domainPattern = configuredDomain.toLowerCase();
     if (!domainPattern.startsWith('@')) {
       domainPattern = '@' + domainPattern;
     }
@@ -154,9 +155,10 @@ export async function checkSchoolEmailAuthorizationAsync(
       };
     }
 
-    // Check domain pattern
-    if (settings.allowedDomain && settings.allowedDomain.trim()) {
-      let domainPattern = settings.allowedDomain.toLowerCase().trim();
+    // Check domain pattern (defaults to @elbiofernandez.edu.uy)
+    const configuredDomain = settings.allowedDomain?.trim() || DEFAULT_SCHOOL_DOMAIN;
+    if (configuredDomain) {
+      let domainPattern = configuredDomain.toLowerCase().trim();
       if (!domainPattern.startsWith('@')) domainPattern = '@' + domainPattern;
       if (cleanEmail.endsWith(domainPattern)) {
         return {
