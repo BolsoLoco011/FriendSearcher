@@ -1,4 +1,4 @@
-import { DEFAULT_ADMIN_EMAIL } from '../config/admin';
+import { DEFAULT_ADMIN_EMAIL, TESTING_ADMIN_EMAIL, isTestingEnvironment } from '../config/admin';
 import { AuthorizedEmail, SchoolSettings } from '../types';
 import { db, collection, getDocs, doc, getDoc } from '../firebase';
 
@@ -32,6 +32,15 @@ export function validateSchoolEmail(
       isAllowed: true,
       isAdmin: true,
       reason: 'Administrador principal escolar por código.'
+    };
+  }
+
+  // 1.1 Testing admin authorized in testing environment (friendsearchertesting.ai.studio / localhost)
+  if (isTestingEnvironment() && cleanEmail === TESTING_ADMIN_EMAIL.toLowerCase()) {
+    return {
+      isAllowed: true,
+      isAdmin: true,
+      reason: 'Administrador autorizado en entorno de pruebas (friendsearchertesting.ai.studio).'
     };
   }
 
@@ -105,6 +114,15 @@ export async function checkSchoolEmailAuthorizationAsync(
       isAllowed: true,
       isAdmin: true,
       reason: 'Administrador principal escolar por código.'
+    };
+  }
+
+  // 1.1 Testing admin check (friendsearchertesting.ai.studio / localhost)
+  if (isTestingEnvironment() && cleanEmail === TESTING_ADMIN_EMAIL.toLowerCase()) {
+    return {
+      isAllowed: true,
+      isAdmin: true,
+      reason: 'Administrador autorizado en entorno de pruebas (friendsearchertesting.ai.studio).'
     };
   }
 

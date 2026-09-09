@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { User, db, doc, setDoc, collection, getDocs, deleteDoc } from '../firebase';
 import { ImageUploadField } from './ImageUploadField';
+import { isUserAdmin } from '../config/admin';
 
 interface OnboardingProfileModalProps {
   currentUser: User;
@@ -28,6 +29,8 @@ interface OnboardingProfileModalProps {
     favoriteFood?: string;
     favoriteMemeStyle?: string;
     traits?: string[];
+    isAdmin?: boolean;
+    role?: string;
   };
   onComplete: () => void;
 }
@@ -170,6 +173,8 @@ export const OnboardingProfileModal: React.FC<OnboardingProfileModalProps> = ({
         joinedEvent: 'Bienvenida a FriendSearcher',
         joinedGroup: 'Comunidad FriendSearcher',
         isConnected: false,
+        isAdmin: initialData?.isAdmin !== undefined ? initialData.isAdmin : isUserAdmin(currentUser.email),
+        role: initialData?.role || (isUserAdmin(currentUser.email) ? 'admin' : 'user'),
         profileCompleted: true,
         updatedAt: new Date().toISOString()
       };
