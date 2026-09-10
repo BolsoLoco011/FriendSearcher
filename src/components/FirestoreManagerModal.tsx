@@ -28,7 +28,7 @@ import { db, doc, deleteDoc, setDoc, updateDoc, collection, User } from '../fire
 import { FriendProfile, MemeItem, CookingItem, EventItem, GroupItem, GymItem, AuthorizedEmail, SchoolSettings } from '../types';
 import { INITIAL_FRIENDS } from '../data/mockData';
 import { unifyDuplicateProfiles } from '../utils/unifyProfiles';
-import { isUserAdmin, canRevokeAdmin, DEFAULT_ADMIN_EMAIL } from '../config/admin';
+import { isUserAdmin, canRevokeAdmin, DEFAULT_ADMIN_EMAIL, TESTING_ADMIN_EMAIL, isTestingEnvironment } from '../config/admin';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 interface FirestoreManagerModalProps {
@@ -144,6 +144,12 @@ export const FirestoreManagerModal: React.FC<FirestoreManagerModalProps> = ({
           <div className="bg-slate-50 rounded-xl p-3 text-[11px] text-slate-600 border border-slate-200 text-left">
             <div className="font-semibold text-slate-700 mb-0.5">Admin principal escolar:</div>
             <code className="text-sky-600 font-mono font-bold">{DEFAULT_ADMIN_EMAIL}</code>
+            {isTestingEnvironment() && (
+              <div className="mt-1.5 pt-1.5 border-t border-slate-200">
+                <div className="font-semibold text-amber-700 mb-0.5">Admin de pruebas (friendsearchertesting.ai.studio):</div>
+                <code className="text-amber-600 font-mono font-bold">{TESTING_ADMIN_EMAIL}</code>
+              </div>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -753,7 +759,10 @@ export const FirestoreManagerModal: React.FC<FirestoreManagerModalProps> = ({
                   const isAuthTab = selectedCol === 'authorized_emails';
                   const user = isUserTab ? (item.data as FriendProfile) : null;
                   const authDoc = isAuthTab ? (item.data as AuthorizedEmail) : null;
-                  const isMasterAdmin = isUserTab && user?.email?.toLowerCase().trim() === DEFAULT_ADMIN_EMAIL.toLowerCase();
+                  const isMasterAdmin = isUserTab && (
+                    user?.email?.toLowerCase().trim() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+                    (isTestingEnvironment() && user?.email?.toLowerCase().trim() === TESTING_ADMIN_EMAIL.toLowerCase())
+                  );
 
                   return (
                     <div

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { User, db, doc, setDoc, collection, getDocs, deleteDoc } from '../firebase';
 import { ImageUploadField } from './ImageUploadField';
+import { isUserAdmin } from '../config/admin';
 
 interface OnboardingProfileModalProps {
   currentUser: User;
@@ -28,6 +29,8 @@ interface OnboardingProfileModalProps {
     favoriteFood?: string;
     favoriteMemeStyle?: string;
     traits?: string[];
+    isAdmin?: boolean;
+    role?: string;
   };
   onComplete: () => void;
 }
@@ -170,27 +173,27 @@ export const OnboardingProfileModal: React.FC<OnboardingProfileModalProps> = ({
         joinedEvent: 'Bienvenida a FriendSearcher',
         joinedGroup: 'Comunidad FriendSearcher',
         isConnected: false,
+        isAdmin: initialData?.isAdmin !== undefined ? initialData.isAdmin : isUserAdmin(currentUser.email),
+        role: initialData?.role || (isUserAdmin(currentUser.email) ? 'admin' : 'user'),
         profileCompleted: true,
         updatedAt: new Date().toISOString()
       };
 
       await setDoc(doc(db, 'users', currentUser.uid), userProfile, { merge: true });
 
-      // Clean up any historical duplicate documents in Firestore matching this user's email or exact name
+      // Clean up any historical duplicate documents in Firestore matching this user's verified email
       try {
-        const usersSnap = await getDocs(collection(db, 'users'));
         const cleanCurrentEmail = (currentUser.email || '').toLowerCase().trim();
-        const cleanCurrentName = name.trim().toLowerCase();
-
-        for (const userDoc of usersSnap.docs) {
-          if (userDoc.id !== currentUser.uid) {
-            const data = userDoc.data();
-            const docEmail = (data.email || '').toLowerCase().trim();
-            const docName = (data.name || '').toLowerCase().trim();
-
-            if ((cleanCurrentEmail && docEmail === cleanCurrentEmail) || (cleanCurrentName && docName === cleanCurrentName)) {
-              // Delete outdated duplicate document so the old favoriteFood NEVER reverts
-              await deleteDoc(doc(db, 'users', userDoc.id)).catch(console.error);
+        if (cleanCurrentEmail) {
+          const usersSnap = await getDocs(collection(db, 'users'));
+          for (const userDoc of usersSnap.docs) {
+            if (userDoc.id !== currentUser.uid) {
+              const data = userDoc.data();
+              const docEmail = (data.email || '').toLowerCase().trim();
+              if (docEmail === cleanCurrentEmail) {
+                console.log(`Eliminando perfil duplicado por email en Firestore: ${userDoc.id}`);
+                await deleteDoc(doc(db, 'users', userDoc.id)).catch(console.error);
+              }
             }
           }
         }

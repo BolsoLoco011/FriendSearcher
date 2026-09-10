@@ -1,47 +1,193 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function
+
+    // =========================================================================
+    // HELPER FUNCTIONS
+    // =========================================================================
+
     function isAuthenticated() {
       return request.auth != null;
     }
 
+    // Ensures the user has a verified, non-anonymous email account
+    function isVerifiedUser() {
+      return isAuthenticated() &&
+             request.auth.token.firebase.sign_in_provider != 'anonymous' &&
+             request.auth.token.email != null;
+    }
+
+    // Code-defined Master Administrators
+    function isMasterAdmin() {
+      return isAuthenticated() &&
+             request.auth.token.email != null &&
+             (
+               request.auth.token.email.lower() == 'juan.manuel.ipar@gmail.com' ||
+               request.auth.token.email.lower() == 'ipar.fernando@gmail.com'
+             );
+    }
+
+    // Role-based Admin check from Firestore document
+    function isDocAdmin() {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             (
+               get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true ||
+               get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+             );
+    }
+
+    function isAdmin() {
+      return isMasterAdmin() || isDocAdmin();
+    }
+
+    // =========================================================================
+    // 1. SCHOOL SETTINGS (/settings)
+    // =========================================================================
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // =========================================================================
+    // 2. AUTHORIZED EMAILS WHITELIST (/authorized_emails)
+    // =========================================================================
+    match /authorized_emails/{emailId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // =========================================================================
+    // 3. USER PROFILES (/users)
+    // =========================================================================
     match /users/{userId} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+
+      // Creation:
+      // - Admins can seed/create any profile.
+      // - Students can only create their own profile and cannot grant themselves admin roles.
+      allow create: if isVerifiedUser() && (
+        isAdmin() || (
+          request.auth.uid == userId &&
+          (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false) &&
+          (!('role' in request.resource.data) || request.resource.data.role == 'user')
+        )
+      );
+
+      // Updates:
+      // - Admins can update any field on any user.
+      // - Users can update their own profile, but CANNOT alter 'isAdmin' or 'role'.
+      // - Other users are only permitted to mutate the 'isConnected' field.
+      allow update: if isVerifiedUser() && (
+        isAdmin() || (
+          request.auth.uid == userId &&
+          (
+            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'role']) ||
+            (
+              request.resource.data.isAdmin == resource.data.isAdmin &&
+              request.resource.data.role == resource.data.role
+            )
+          )
+        ) || (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isConnected'])
+        )
+      );
+
+      // Deletion:
+      // - Admins can delete any profile.
+      // - Users can delete their own profile or duplicate docs matching their email.
+      allow delete: if isVerifiedUser() && (
+        isAdmin() ||
+        request.auth.uid == userId ||
+        (resource.data.email != null && resource.data.email.lower() == request.auth.token.email.lower())
+      );
     }
 
+    // =========================================================================
+    // 4. MEMES (/memes)
+    // =========================================================================
     match /memes/{memeId} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow create: if isVerifiedUser();
+
+      allow update: if isVerifiedUser() && (
+        isAdmin() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes', 'userVoted', 'upvotes', 'upvotedBy']) ||
+        ('creatorId' in resource.data && resource.data.creatorId == request.auth.uid)
+      );
+
+      allow delete: if isVerifiedUser() && (
+        isAdmin() ||
+        ('creatorId' in resource.data && resource.data.creatorId == request.auth.uid)
+      );
     }
 
+    // =========================================================================
+    // 5. EVENTS (/events)
+    // =========================================================================
     match /events/{eventId} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow create: if isVerifiedUser();
+
+      allow update: if isVerifiedUser() && (
+        isAdmin() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendees', 'isJoined', 'participantsCount', 'participants']) ||
+        ('creatorId' in resource.data && resource.data.creatorId == request.auth.uid)
+      );
+
+      allow delete: if isVerifiedUser() && (
+        isAdmin() ||
+        ('creatorId' in resource.data && resource.data.creatorId == request.auth.uid)
+      );
     }
 
+    // =========================================================================
+    // 6. COOKING & RECIPES (/cooking)
+    // =========================================================================
     match /cooking/{cookingId} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow create: if isVerifiedUser();
+
+      allow update: if isVerifiedUser() && (
+        isAdmin() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['membersInterested', 'likes', 'likedBy']) ||
+        ('chefId' in resource.data && resource.data.chefId == request.auth.uid)
+      );
+
+      allow delete: if isVerifiedUser() && (
+        isAdmin() ||
+        ('chefId' in resource.data && resource.data.chefId == request.auth.uid)
+      );
     }
 
+    // =========================================================================
+    // 7. GROUPS (/groups) & GYM (/gym)
+    // =========================================================================
     match /groups/{groupId} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow create, delete: if isVerifiedUser() && isAdmin();
+      allow update: if isVerifiedUser() && (
+        isAdmin() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isJoined', 'membersCount', 'members'])
+      );
     }
 
     match /gym/{gymId} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow create, delete: if isVerifiedUser() && isAdmin();
+      allow update: if isVerifiedUser() && (
+        isAdmin() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isJoined', 'membersCount'])
+      );
     }
 
+    // =========================================================================
+    // 8. CHAT MESSAGES (/messages)
+    // =========================================================================
     match /messages/{messageId} {
-      allow read, write: if isAuthenticated();
-    }
-
-    match /authorized_emails/{emailId} {
-      allow read: if true;
-      allow write: if isAuthenticated();
-    }
-
-    match /settings/{settingId} {
-      allow read: if true;
-      allow write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow create: if isVerifiedUser();
+      allow update, delete: if isAdmin();
     }
   }
 }

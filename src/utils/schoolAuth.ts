@@ -1,4 +1,4 @@
-import { DEFAULT_ADMIN_EMAIL } from '../config/admin';
+import { DEFAULT_ADMIN_EMAIL, TESTING_ADMIN_EMAIL, isTestingEnvironment, DEFAULT_SCHOOL_DOMAIN } from '../config/admin';
 import { AuthorizedEmail, SchoolSettings } from '../types';
 import { db, collection, getDocs, doc, getDoc } from '../firebase';
 
@@ -35,6 +35,15 @@ export function validateSchoolEmail(
     };
   }
 
+  // 1.1 Testing admin authorized in testing environment (friendsearchertesting.ai.studio / localhost)
+  if (isTestingEnvironment() && cleanEmail === TESTING_ADMIN_EMAIL.toLowerCase()) {
+    return {
+      isAllowed: true,
+      isAdmin: true,
+      reason: 'Administrador autorizado en entorno de pruebas (friendsearchertesting.ai.studio).'
+    };
+  }
+
   // 2. Check whitelist records (comparing both email property and safe document ID)
   const safeId = cleanEmail.replace(/[^a-zA-Z0-9]/g, '_');
   const match = whitelist.find(item => {
@@ -51,9 +60,10 @@ export function validateSchoolEmail(
     };
   }
 
-  // 3. Check allowed domain (e.g. '@escuela.edu') if configured
-  if (settings.allowedDomain && settings.allowedDomain.trim()) {
-    let domainPattern = settings.allowedDomain.toLowerCase().trim();
+  // 3. Check allowed domain (defaults to @elbiofernandez.edu.uy)
+  const configuredDomain = settings.allowedDomain?.trim() || DEFAULT_SCHOOL_DOMAIN;
+  if (configuredDomain) {
+    let domainPattern = configuredDomain.toLowerCase();
     if (!domainPattern.startsWith('@')) {
       domainPattern = '@' + domainPattern;
     }
@@ -108,6 +118,15 @@ export async function checkSchoolEmailAuthorizationAsync(
     };
   }
 
+  // 1.1 Testing admin check (friendsearchertesting.ai.studio / localhost)
+  if (isTestingEnvironment() && cleanEmail === TESTING_ADMIN_EMAIL.toLowerCase()) {
+    return {
+      isAllowed: true,
+      isAdmin: true,
+      reason: 'Administrador autorizado en entorno de pruebas (friendsearchertesting.ai.studio).'
+    };
+  }
+
   // 2. Fast check with cached whitelist if available
   if (cachedWhitelist && cachedWhitelist.length > 0) {
     const quickResult = validateSchoolEmail(email, cachedWhitelist, cachedSettings);
@@ -136,9 +155,10 @@ export async function checkSchoolEmailAuthorizationAsync(
       };
     }
 
-    // Check domain pattern
-    if (settings.allowedDomain && settings.allowedDomain.trim()) {
-      let domainPattern = settings.allowedDomain.toLowerCase().trim();
+    // Check domain pattern (defaults to @elbiofernandez.edu.uy)
+    const configuredDomain = settings.allowedDomain?.trim() || DEFAULT_SCHOOL_DOMAIN;
+    if (configuredDomain) {
+      let domainPattern = configuredDomain.toLowerCase().trim();
       if (!domainPattern.startsWith('@')) domainPattern = '@' + domainPattern;
       if (cleanEmail.endsWith(domainPattern)) {
         return {

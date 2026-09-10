@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, LogIn, LogOut, User as UserIcon, Sparkles, ShieldCheck, Check, Database } from 'lucide-react';
-import { auth, googleProvider, microsoftProvider, signInWithPopup, signInAnonymously, signOut, User } from '../firebase';
+import { auth, googleProvider, microsoftProvider, signInWithPopup, signOut, User } from '../firebase';
 import { isUserAdmin } from '../config/admin';
 import { AuthorizedEmail, SchoolSettings } from '../types';
 import { validateSchoolEmail, checkSchoolEmailAuthorizationAsync } from '../utils/schoolAuth';
@@ -52,7 +52,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       if (msg.includes('popup-closed-by-user')) {
         setErrorMsg('La ventana de inicio de sesión fue cerrada.');
       } else {
-        setErrorMsg('No se pudo conectar con Google. Puedes usar tu cuenta de Microsoft o invitado.');
+        setErrorMsg('No se pudo conectar con Google. Puedes usar tu cuenta institucional de Microsoft.');
       }
     } finally {
       setLoading(false);
@@ -83,20 +83,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       } else {
         setErrorMsg('No se pudo conectar con Microsoft. Verifica tu cuenta o usa Google.');
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAnonymousSignIn = async () => {
-    setLoading(true);
-    setErrorMsg(null);
-    try {
-      await signInAnonymously(auth);
-      onClose();
-    } catch (err: unknown) {
-      console.error('Anonymous Sign-in error:', err);
-      setErrorMsg('Error al conectar sesión anónima.');
     } finally {
       setLoading(false);
     }
@@ -261,21 +247,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                 </svg>
-                <span>Continuar con Google</span>
-              </button>
-
-              <div className="flex items-center my-2 text-xs text-slate-400 before:flex-1 before:border-t before:border-slate-200 before:mr-3 after:flex-1 after:border-t after:border-slate-200 after:ml-3">
-                o
-              </div>
-
-              <button
-                id="btn-guest-login"
-                onClick={handleAnonymousSignIn}
-                disabled={loading}
-                className="w-full py-2.5 px-4 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
-              >
-                <UserIcon className="w-4 h-4" />
-                <span>Entrar como Invitado rápido</span>
+                <span>Continuar con Google (Administrador)</span>
               </button>
             </div>
 
