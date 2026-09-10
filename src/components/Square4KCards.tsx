@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Laugh, Utensils, CalendarCheck, Users, Dumbbell, Gamepad2, ExternalLink, Filter } from 'lucide-react';
+import { Sparkles, Laugh, Utensils, CalendarCheck, Users, Dumbbell, Gamepad2, Trophy, ExternalLink, Filter } from 'lucide-react';
 import { CategoryCardInfo, CategoryKey } from '../types';
 
 interface Square4KCardsProps {
@@ -13,6 +13,8 @@ const getCategoryIcon = (iconName: string) => {
   switch (iconName) {
     case 'Sparkles':
       return <Sparkles className="w-5 h-5" />;
+    case 'Trophy':
+      return <Trophy className="w-5 h-5" />;
     case 'Laugh':
       return <Laugh className="w-5 h-5" />;
     case 'Utensils':
@@ -65,8 +67,8 @@ export const Square4KCards: React.FC<Square4KCardsProps> = ({
         </div>
       </div>
 
-      {/* Grid of 6 Square 4K HD Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4 lg:gap-5">
+      {/* Grid of Square 4K HD Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3.5 sm:gap-4">
         {categories.map((cat) => {
           const isSelected = selectedCategory === cat.key;
 
@@ -105,6 +107,29 @@ export const Square4KCards: React.FC<Square4KCardsProps> = ({
                 <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10">
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sky-500 text-white text-[10px] font-bold shadow-xs">
                     Filtrando
+                  </span>
+                </div>
+              )}
+
+              {/* Top Right Badge / Logos for Deportes */}
+              {cat.key === 'deportes' ? (
+                <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-10 flex items-center gap-1.5 bg-slate-950/90 backdrop-blur-xs px-2.5 py-1 rounded-full border border-sky-400/50 shadow-md">
+                  <div className="flex items-center gap-1">
+                    <img src="/psg.svg" alt="PSG" className="w-4 h-4 object-contain" />
+                    <span className="text-[8px] font-black text-sky-300">vs</span>
+                    <img src="/bayern.svg" alt="Bayern" className="w-4 h-4 object-contain" />
+                  </div>
+                  <span className="text-[9px] text-slate-500">•</span>
+                  <div className="flex items-center gap-1">
+                    <img src="/barca.svg" alt="Barça" className="w-4 h-4 object-contain" />
+                    <span className="text-[8px] font-black text-amber-300">vs</span>
+                    <img src="/real-madrid.svg" alt="Madrid" className="w-4 h-4 object-contain" />
+                  </div>
+                </div>
+              ) : (
+                <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-10">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-950/70 backdrop-blur-xs text-white text-[9px] font-extrabold tracking-wider border border-white/10 shadow-xs">
+                    {cat.badge}
                   </span>
                 </div>
               )}

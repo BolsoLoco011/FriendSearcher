@@ -23,9 +23,10 @@ import {
   INITIAL_COOKING, 
   INITIAL_EVENTS, 
   INITIAL_GROUPS,
-  INITIAL_GYM
+  INITIAL_GYM,
+  INITIAL_SPORTS
 } from './data/mockData';
-import { CategoryKey, CategoryCardInfo, FriendProfile, MemeItem, CookingItem, EventItem, GroupItem, GymItem, AuthorizedEmail, SchoolSettings } from './types';
+import { CategoryKey, CategoryCardInfo, FriendProfile, MemeItem, CookingItem, EventItem, GroupItem, GymItem, SportItem, AuthorizedEmail, SchoolSettings } from './types';
 import { Sparkles, HeartHandshake, Compass, Flame, CloudCheck, ShieldCheck, AlertOctagon, GraduationCap } from 'lucide-react';
 import { isUserAdmin, DEFAULT_ADMIN_EMAIL } from './config/admin';
 import { validateSchoolEmail, checkSchoolEmailAuthorizationAsync } from './utils/schoolAuth';
@@ -51,6 +52,7 @@ export default function App() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [groups, setGroups] = useState<GroupItem[]>([]);
   const [gym, setGym] = useState<GymItem[]>([]);
+  const [sports, setSports] = useState<SportItem[]>([]);
   const [authorizedEmails, setAuthorizedEmails] = useState<AuthorizedEmail[]>([]);
   const [isAuthEmailsLoaded, setIsAuthEmailsLoaded] = useState(false);
   const [schoolSettings, setSchoolSettings] = useState<SchoolSettings>({
@@ -350,6 +352,33 @@ export default function App() {
       }
     }, (err) => console.warn('Gym Firestore notice:', err));
 
+    // Sync Sports directly from Firestore
+    const unsubSports = onSnapshot(collection(db, 'sports'), (snapshot) => {
+      if (snapshot.empty) {
+        INITIAL_SPORTS.forEach(s => {
+          setDoc(doc(db, 'sports', s.id), s, { merge: true }).catch(() => {});
+        });
+      } else {
+        const loadedSports = snapshot.docs.map(d => ({ ...d.data(), id: d.id } as SportItem));
+        // Always make sure sport-clasico and sport-champions are present and updated
+        if (!loadedSports.some(s => s.id === 'sport-clasico')) {
+          const clasicoInitial = INITIAL_SPORTS.find(s => s.id === 'sport-clasico');
+          if (clasicoInitial) {
+            setDoc(doc(db, 'sports', 'sport-clasico'), clasicoInitial, { merge: true }).catch(() => {});
+            loadedSports.unshift(clasicoInitial);
+          }
+        }
+        if (!loadedSports.some(s => s.id === 'sport-champions')) {
+          const championsInitial = INITIAL_SPORTS.find(s => s.id === 'sport-champions');
+          if (championsInitial) {
+            setDoc(doc(db, 'sports', 'sport-champions'), championsInitial, { merge: true }).catch(() => {});
+            loadedSports.unshift(championsInitial);
+          }
+        }
+        setSports(loadedSports);
+      }
+    }, (err) => console.warn('Sports Firestore notice:', err));
+
     return () => {
       unsubFriends();
       unsubMemes();
@@ -357,6 +386,7 @@ export default function App() {
       unsubEvents();
       unsubGroups();
       unsubGym();
+      unsubSports();
     };
   }, [currentUser]);
 
@@ -484,6 +514,79 @@ export default function App() {
     } catch (err) {
       console.warn('Error syncing gym join to Firestore:', err);
     }
+  };
+
+  const handleToggleSportJoin = async (id: string) => {
+    const item = sports.find(s => s.id === id);
+    const newJoined = item ? !item.isJoined : true;
+    const newPlayers = item ? (newJoined ? item.playersCount + 1 : Math.max(0, item.playersCount - 1)) : 1;
+
+    setSports(prev => prev.map(s => {
+      if (s.id === id) {
+        return { ...s, isJoined: newJoined, playersCount: newPlayers };
+      }
+      return s;
+    }));
+
+    try {
+      await setDoc(doc(db, 'sports', id), { isJoined: newJoined, playersCount: newPlayers }, { merge: true });
+    } catch (err) {
+      console.warn('Error syncing sports join to Firestore:', err);
+    }
+  };
+
+  const handleVoteClasico = async (team: 'barca' | 'madrid' | 'draw') => {
+    setSports(prev => prev.map(s => {
+      if (s.id === 'sport-clasico') {
+        const currentData = s.clasicoData || { barcaVotes: 142, madridVotes: 138, drawVotes: 24 };
+        const prevVote = currentData.userVote;
+        let b = currentData.barcaVotes ?? 142;
+        let m = currentData.madridVotes ?? 138;
+        let d = currentData.drawVotes ?? 24;
+
+        if (prevVote === team) return s; // already voted for this option
+
+        if (prevVote === 'barca') b = Math.max(0, b - 1);
+        if (prevVote === 'madrid') m = Math.max(0, m - 1);
+        if (prevVote === 'draw') d = Math.max(0, d - 1);
+
+        if (team === 'barca') b += 1;
+        if (team === 'madrid') m += 1;
+        if (team === 'draw') d += 1;
+
+        const updatedData = { ...currentData, barcaVotes: b, madridVotes: m, drawVotes: d, userVote: team };
+        setDoc(doc(db, 'sports', 'sport-clasico'), { clasicoData: updatedData }, { merge: true }).catch(() => {});
+        return { ...s, clasicoData: updatedData };
+      }
+      return s;
+    }));
+  };
+
+  const handleVoteChampions = async (team: 'psg' | 'bayern' | 'draw') => {
+    setSports(prev => prev.map(s => {
+      if (s.id === 'sport-champions') {
+        const currentData = s.championsData || { psgVotes: 132, bayernVotes: 139, drawVotes: 21 };
+        const prevVote = currentData.userVote;
+        let p = currentData.psgVotes ?? 132;
+        let b = currentData.bayernVotes ?? 139;
+        let d = currentData.drawVotes ?? 21;
+
+        if (prevVote === team) return s;
+
+        if (prevVote === 'psg') p = Math.max(0, p - 1);
+        if (prevVote === 'bayern') b = Math.max(0, b - 1);
+        if (prevVote === 'draw') d = Math.max(0, d - 1);
+
+        if (team === 'psg') p += 1;
+        if (team === 'bayern') b += 1;
+        if (team === 'draw') d += 1;
+
+        const updatedData = { ...currentData, psgVotes: p, bayernVotes: b, drawVotes: d, userVote: team };
+        setDoc(doc(db, 'sports', 'sport-champions'), { championsData: updatedData }, { merge: true }).catch(() => {});
+        return { ...s, championsData: updatedData };
+      }
+      return s;
+    }));
   };
 
   // Open Category detail
@@ -717,7 +820,7 @@ export default function App() {
             </h1>
 
             <p className="mt-2.5 text-xs sm:text-sm text-sky-800 leading-relaxed">
-              Explora los <strong>6 cuadrados</strong> de memes, cocina, eventos, grupos, gimnasio y juegos. Descubre afinidad en <strong>CARACTERISTICAS</strong> (arriba a la izquierda).
+              Explora los <strong>7 cuadrados</strong> de deportes, memes, cocina, eventos, grupos, gimnasio y juegos. Descubre afinidad en <strong>CARACTERISTICAS</strong> (arriba a la izquierda).
             </p>
 
             <div className="flex flex-wrap items-center gap-3 mt-5 justify-center sm:justify-start text-xs">
@@ -745,7 +848,7 @@ export default function App() {
               <Compass className="w-6 h-6 animate-spin-slow" />
             </div>
             <span className="text-xs font-bold text-sky-800">Explorador Rápido</span>
-            <span className="text-base font-black text-sky-950 mt-0.5">6 Cuadrados 4K HD</span>
+            <span className="text-base font-black text-sky-950 mt-0.5">7 Cuadrados 4K HD</span>
             <p className="text-[11px] text-sky-700 mt-1 leading-snug">
               Toca un cuadrado para filtrar el feed o ver contenido exclusivo.
             </p>
@@ -753,7 +856,7 @@ export default function App() {
 
         </div>
 
-        {/* 1. LOS 6 CUADRADOS 4K HD DE: MEMES, COCINA, EVENTOS, GRUPOS, GIMNASIO Y JUEGOS */}
+        {/* 1. LOS 7 CUADRADOS 4K HD DE: DEPORTES, MEMES, COCINA, EVENTOS, GRUPOS, GIMNASIO Y JUEGOS */}
         <Square4KCards
           categories={CATEGORIES_DATA}
           selectedCategory={selectedCategory}
@@ -820,6 +923,7 @@ export default function App() {
         events={events}
         groups={groups}
         gym={gym}
+        sports={sports}
         friends={friends}
         onOpenFriendDetail={(friend) => setActiveFriendModal(friend)}
         onToggleConnect={handleToggleConnect}
@@ -827,6 +931,9 @@ export default function App() {
         onToggleEventJoin={handleToggleEventJoin}
         onToggleGroupJoin={handleToggleGroupJoin}
         onToggleGymJoin={handleToggleGymJoin}
+        onToggleSportJoin={handleToggleSportJoin}
+        onVoteClasico={handleVoteClasico}
+        onVoteChampions={handleVoteChampions}
         onSelectTraitFilter={(trait) => {
           setActiveTraitFilter(trait);
           setActiveCategoryModal(null);

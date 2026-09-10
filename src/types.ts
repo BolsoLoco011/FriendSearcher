@@ -1,4 +1,4 @@
-export type CategoryKey = 'caracteristicas' | 'memes' | 'cocina' | 'eventos' | 'grupos' | 'gimnasio' | 'juegos';
+export type CategoryKey = 'caracteristicas' | 'deportes' | 'memes' | 'cocina' | 'eventos' | 'grupos' | 'gimnasio' | 'juegos';
 
 export interface CategoryCardInfo {
   key: CategoryKey;
@@ -110,5 +110,34 @@ export interface GymItem {
   schedule: string;
   isJoined?: boolean;
   notes?: string;
+}
+
+export interface SportItem {
+  id: string;
+  title: string;
+  sport: string; // ej: 'Fútbol 5', 'Fútbol 7', 'Pádel', 'Básquetbol', 'Tenis'
+  location: string;
+  hostName: string;
+  imageUrl: string;
+  playersCount: number;
+  maxPlayers: number;
+  schedule: string;
+  level: string; // 'Amateur', 'Intermedio', 'Competitivo'
+  isJoined?: boolean;
+  notes?: string;
+  isClasico?: boolean;
+  clasicoData?: {
+    barcaVotes?: number;
+    madridVotes?: number;
+    drawVotes?: number;
+    userVote?: 'barca' | 'madrid' | 'draw';
+  };
+  isChampions?: boolean;
+  championsData?: {
+    psgVotes?: number;
+    bayernVotes?: number;
+    drawVotes?: number;
+    userVote?: 'psg' | 'bayern' | 'draw';
+  };
 }
 

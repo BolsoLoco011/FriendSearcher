@@ -1,6 +1,6 @@
 {
   "name": "FriendSearcher",
-  "description": "Encuentra amigos con afinidad real mediante características, memes, cocina, eventos, grupos, gimnasio y minivideojuegos (Piedra Papel Tijera, Snake 1v1 y Ta-Te-Ti) en una interfaz web moderna.",
+  "description": "Encuentra amigos con afinidad real mediante características, deportes (fútbol y torneos), memes, cocina, eventos, grupos, gimnasio y minivideojuegos (Piedra Papel Tijera, Snake 1v1 y Ta-Te-Ti) en una interfaz web moderna.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -17,7 +17,8 @@ import {
   Loader2,
   Edit3,
   Dumbbell,
-  Gamepad2
+  Gamepad2,
+  Trophy
 } from 'lucide-react';
 import { FriendProfile, CategoryKey } from '../types';
 import { calculateCompatibility } from '../utils/compatibility';
@@ -67,6 +68,15 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
       // Also check if category keywords match
       const catMatch = 
         (selectedCategory === 'caracteristicas' && friend.traits.length > 0) ||
+        (selectedCategory === 'deportes' && (
+          friend.traits.some(t => {
+            const n = t.toLowerCase();
+            return n.includes('deporte') || n.includes('fútbol') || n.includes('futbol') || n.includes('básquet') || n.includes('basquet') || n.includes('running') || n.includes('tenis') || n.includes('pádel') || n.includes('padel');
+          }) ||
+          friend.joinedGroup?.toLowerCase().includes('futbol') ||
+          friend.joinedGroup?.toLowerCase().includes('deporte') ||
+          friend.joinedEvent?.toLowerCase().includes('futbol')
+        )) ||
         (selectedCategory === 'memes' && friend.favoriteMemeStyle) ||
         (selectedCategory === 'cocina' && friend.favoriteFood) ||
         (selectedCategory === 'eventos' && friend.joinedEvent) ||
@@ -209,6 +219,18 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
           >
             <Sparkles className="w-3 h-3 text-sky-600" />
             Características
+          </button>
+
+          <button
+            onClick={() => onSelectCategory('deportes')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              selectedCategory === 'deportes'
+                ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                : 'bg-sky-200/80 text-sky-900 hover:bg-sky-300 border border-sky-300'
+            }`}
+          >
+            <Trophy className="w-3 h-3 text-emerald-700" />
+            Deportes
           </button>
 
           <button

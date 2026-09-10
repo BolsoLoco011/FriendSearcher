@@ -1,4 +1,4 @@
-import { CategoryCardInfo, FriendProfile, MemeItem, CookingItem, EventItem, GroupItem, GymItem } from '../types';
+import { CategoryCardInfo, FriendProfile, MemeItem, CookingItem, EventItem, GroupItem, GymItem, SportItem } from '../types';
 
 export const CARACTERISTICAS_CATEGORY: CategoryCardInfo = {
   key: 'caracteristicas',
@@ -13,6 +13,17 @@ export const CARACTERISTICAS_CATEGORY: CategoryCardInfo = {
 };
 
 export const CATEGORIES_DATA: CategoryCardInfo[] = [
+  {
+    key: 'deportes',
+    title: 'Deportes',
+    subtitle: 'PSG vs Bayern & El Clásico',
+    badge: 'CHAMPIONS & CLÁSICO ⚽',
+    image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1000&q=85',
+    countLabel: 'PSG vs Bayern • Barça vs Madrid • Fútbol 5',
+    color: 'from-amber-600 via-rose-700 to-blue-900',
+    iconName: 'Trophy',
+    description: '¡Partidazo de Champions League PSG vs Bayern Múnich (se vuelven a enfrentar tras las semifinales) y El Clásico! Además arma partidos de fútbol 5, fútbol 7 y torneos deportivos.'
+  },
   {
     key: 'memes',
     title: 'Memes',
@@ -305,6 +316,107 @@ export const INITIAL_GYM: GymItem[] = [
     schedule: 'Miércoles y Sábados • 08:00 hs',
     isJoined: false,
     notes: 'Trote suave y progresivo, ideal para despejarse y ganar resistencia cardiovascular.'
+  }
+];
+
+export const INITIAL_SPORTS: SportItem[] = [
+  {
+    id: 'sport-champions',
+    title: '¡¡¡PSG VS BAYERN MUNICH POR CHAMPIONS LEAGUE!!!!!!!!!!!',
+    sport: 'Champions League • Revancha de Semifinales',
+    location: 'Estadio Virtual FriendSearcher & Sports Bar (Pantalla Gigante 4K)',
+    hostName: 'Comunidad UEFA & Amigos',
+    imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1000&q=80',
+    playersCount: 56,
+    maxPlayers: 70,
+    schedule: 'Miércoles • 16:00 hs (Previa 15:00 hs)',
+    level: 'Champions League • Hinchas & Pasión Europea',
+    isJoined: true,
+    notes: '¡¡¡SE VUELVEN A ENFRENTAR TRAS LAS SEMIFINALES!!! PSG vs Bayern Múnich por UEFA Champions League. Revancha europea histórica para vivir en pantalla gigante con amigos, picada libre, camisetas y prode en vivo. ¿Quién avanzará?',
+    isChampions: true,
+    championsData: {
+      psgVotes: 132,
+      bayernVotes: 139,
+      drawVotes: 21,
+      userVote: 'psg'
+    }
+  },
+  {
+    id: 'sport-clasico',
+    title: '¡¡¡EL CLÁSICO!!!! FC BARCELONA VS REAL MADRID',
+    sport: 'El Clásico • Fútbol Mundial',
+    location: 'Bar Deportivo La Redonda & Club Social (Pantalla Gigante 4K)',
+    hostName: 'Comunidad FriendSearcher',
+    imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1000&q=80',
+    playersCount: 48,
+    maxPlayers: 60,
+    schedule: 'Domingo • 16:00 hs (Previa 15:00 hs)',
+    level: 'Hinchas, Amigos & Pasión Futbolera',
+    isJoined: true,
+    notes: '¡¡¡EL PARTIDO MÁS ESPERADO DEL MUNDO!!! Gran juntada futbolera para vivir el Clásico en pantalla gigante con amigos, picada, camisetas de ambos equipos y prode en vivo. ¿Quién se queda con el orgullo futbolero?',
+    isClasico: true,
+    clasicoData: {
+      barcaVotes: 142,
+      madridVotes: 138,
+      drawVotes: 24,
+      userVote: 'barca'
+    }
+  },
+  {
+    id: 'sport-1',
+    title: 'Fútbol 5 Nocturno • ¡Falta 1 para el Partido!',
+    sport: 'Fútbol 5',
+    location: 'Canchas La Redonda (Sintético techado)',
+    hostName: 'Benja',
+    imageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=800&q=80',
+    playersCount: 9,
+    maxPlayers: 10,
+    schedule: 'Miércoles • 20:30 hs',
+    level: 'Amateur / Intermedio',
+    isJoined: true,
+    notes: 'Partido mixto semanal entre amigos. Jugamos con pecheras, tercer tiempo con hidratación y charla post-partido.'
+  },
+  {
+    id: 'sport-2',
+    title: 'Torneo Relámpago Fútbol 7 de Fin de Semana',
+    sport: 'Fútbol 7',
+    location: 'Complejo Deportivo El Golazo',
+    hostName: 'Marcos Díaz',
+    imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+    playersCount: 12,
+    maxPlayers: 14,
+    schedule: 'Sábado • 16:00 hs',
+    level: 'Intermedio',
+    isJoined: false,
+    notes: 'Torneo de 4 equipos, tiempo reducido con árbitro y copa simbólica. ¡Trae tus botines!'
+  },
+  {
+    id: 'sport-3',
+    title: 'Pádel Dobles • Nivel 6ta / 5ta',
+    sport: 'Pádel',
+    location: 'Padel Club Central',
+    hostName: 'Lucía Morales',
+    imageUrl: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=800&q=80',
+    playersCount: 3,
+    maxPlayers: 4,
+    schedule: 'Jueves • 19:00 hs',
+    level: 'Amateur / Divertido',
+    isJoined: false,
+    notes: 'Buscamos 4to jugador/a para completar dobles en cancha de blindex. Pelotas nuevas incluidas.'
+  },
+  {
+    id: 'sport-4',
+    title: 'Básquet 3v3 Media Cancha Callejero',
+    sport: 'Básquetbol',
+    location: 'Parque Urbano • Cancha Azul',
+    hostName: 'Facundo Rossi',
+    imageUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80',
+    playersCount: 5,
+    maxPlayers: 6,
+    schedule: 'Domingo • 17:30 hs',
+    level: 'Todos los niveles',
+    isJoined: false,
+    notes: 'Tiradas al aro, 3v3 libre y música de fondo para pasar la tarde con buena vibra.'
   }
 ];
 
