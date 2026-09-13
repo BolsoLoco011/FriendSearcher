@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Soft glow for cyan starburst -->
+    <filter id="cyan-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Outer Circle: Left and Right Hemispheres -->
+  <!-- Left Outer Hemisphere (Soft Sky Blue) -->
+  <path d="M 256,51 A 205 205 0 0 0 256,461 Z" fill="#6ec5ff" />
+  <!-- Right Outer Hemisphere (Vivid Sky Blue) -->
+  <path d="M 256,51 A 205 205 0 0 1 256,461 Z" fill="#22a3ff" />
+
+  <!-- Middle Concentric Ring: Left and Right -->
+  <!-- Left Middle (Lighter Sky Blue) -->
+  <path d="M 256,100 A 156 156 0 0 0 256,412 Z" fill="#9ee1ff" />
+  <!-- Right Middle (Medium Vivid Azure) -->
+  <path d="M 256,100 A 156 156 0 0 1 256,412 Z" fill="#51beff" />
+
+  <!-- Inner Concentric Circle Backdrop -->
+  <!-- Left Inner Backdrop -->
+  <path d="M 256,124 A 132 132 0 0 0 256,388 Z" fill="#8ed7ff" />
+  <!-- Right Inner Backdrop -->
+  <path d="M 256,124 A 132 132 0 0 1 256,388 Z" fill="#5dc4ff" />
+
+  <!-- Vertical Split Division Axis Line -->
+  <line x1="256" y1="51" x2="256" y2="461" stroke="#1b98ee" stroke-width="1.5" opacity="0.45" />
+
+  <!-- 12-Pointed Glowing Cyan Starburst Badge / Seal -->
+  <path d="M 256.00,114.00 L 283.95,151.68 L 327.00,133.02 L 332.37,179.63 L 378.98,185.00 L 360.32,228.05 L 398.00,256.00 L 360.32,283.95 L 378.98,327.00 L 332.37,332.37 L 327.00,378.98 L 283.95,360.32 L 256.00,398.00 L 228.05,360.32 L 185.00,378.98 L 179.63,332.37 L 133.02,327.00 L 151.68,283.95 L 114.00,256.00 L 151.68,228.05 L 133.02,185.00 L 179.63,179.63 L 185.00,133.02 L 228.05,151.68 Z" 
+        fill="#00f0ff" 
+        filter="url(#cyan-glow)" />
+
+  <!-- Center 5-Pointed Rounded Star in Dodger Sky Blue -->
+  <path d="M 256.00,173.00 L 279.51,226.64 L 337.79,232.42 L 294.04,271.36 L 306.55,328.58 L 256.00,299.00 L 205.45,328.58 L 217.96,271.36 L 174.21,232.42 L 232.49,226.64 Z" 
+        fill="#22a3ff" 
+        stroke="#22a3ff" 
+        stroke-width="16" 
+        stroke-linejoin="round" 
+        stroke-linecap="round" />
+</svg>

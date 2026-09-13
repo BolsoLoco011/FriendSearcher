@@ -97,8 +97,8 @@ export const AuthWall: React.FC<AuthWallProps> = ({
       
       {/* Brand Top Pill */}
       <div className="mb-6 text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-100 border border-sky-400 text-sky-950 text-xs font-black shadow-xs">
-          <Lock className="w-3.5 h-3.5 text-sky-600" />
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-100 border border-sky-400 text-sky-950 text-xs font-black shadow-xs">
+          <img src="/logo.svg" alt="Logo" className="w-4 h-4 object-contain" />
           <span>Acceso Privado Institucional</span>
         </div>
       </div>
@@ -110,8 +110,12 @@ export const AuthWall: React.FC<AuthWallProps> = ({
       >
         {/* Card Header Banner */}
         <div className="p-6 sm:p-8 bg-sky-100 border-b border-sky-200 text-center">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-sky-500 text-white flex items-center justify-center shadow-lg shadow-sky-300 mb-4">
-            <GraduationCap className="w-8 h-8" />
+          <div className="w-20 h-20 mx-auto flex items-center justify-center mb-3">
+            <img 
+              src="/logo.svg" 
+              alt="FriendSearcher Logo" 
+              className="w-20 h-20 object-contain drop-shadow-md hover:scale-105 transition-transform" 
+            />
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-sky-950 tracking-tight">
             FriendSearcher

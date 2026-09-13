@@ -36,11 +36,13 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-3.5">
           <div
             id="friendsearcher-title-capsule"
-            className="inline-flex items-center gap-2.5 bg-sky-600/90 hover:bg-sky-600 border border-white/25 px-5 sm:px-6 py-2 sm:py-2.5 rounded-full shadow-sm hover:shadow transition-all cursor-pointer"
+            className="inline-flex items-center gap-2.5 bg-sky-600/90 hover:bg-sky-600 border border-white/25 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full shadow-sm hover:shadow transition-all cursor-pointer group"
           >
-            <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white">
-              <Compass className="w-3.5 h-3.5 animate-spin-slow" />
-            </div>
+            <img
+              src="/logo.svg"
+              alt="FriendSearcher Logo"
+              className="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-sm group-hover:scale-110 transition-transform"
+            />
             <h1 className="text-white font-black text-lg sm:text-xl tracking-tight leading-none">
               FriendSearcher
             </h1>

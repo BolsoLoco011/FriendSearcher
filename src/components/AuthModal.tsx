@@ -202,8 +202,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         ) : (
           <div className="space-y-5">
             <div className="text-center">
-              <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-3 border border-sky-100">
-                <Sparkles className="w-6 h-6" />
+              <div className="w-14 h-14 flex items-center justify-center mx-auto mb-2.5">
+                <img src="/logo.svg" alt="FriendSearcher Logo" className="w-14 h-14 object-contain drop-shadow-sm" />
               </div>
               <h3 className="text-lg font-black text-slate-900">
                 Conéctate a FriendSearcher

@@ -750,8 +750,12 @@ export default function App() {
   if (isAuthInitializing) {
     return (
       <div className="min-h-screen bg-sky-100 flex flex-col items-center justify-center p-4">
-        <div className="w-12 h-12 rounded-2xl bg-sky-500 text-white flex items-center justify-center shadow-lg shadow-sky-300 mb-4 animate-pulse">
-          <Sparkles className="w-6 h-6" />
+        <div className="w-16 h-16 mb-4 flex items-center justify-center">
+          <img 
+            src="/logo.svg" 
+            alt="FriendSearcher Logo" 
+            className="w-16 h-16 object-contain drop-shadow-lg animate-pulse" 
+          />
         </div>
         <p className="text-sm font-bold text-sky-950">Iniciando FriendSearcher...</p>
         <p className="text-xs text-sky-700 mt-1">Verificando sesión segura en Firestore</p>
@@ -814,7 +818,7 @@ export default function App() {
           <div className="max-w-2xl">
             {/* Título en Cápsula Celeste Destacada */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-200/80 border border-sky-400 text-sky-900 text-xs sm:text-sm font-bold mb-3 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-sky-600 animate-pulse"></span>
+              <img src="/logo.svg" alt="Logo" className="w-4 h-4 object-contain" />
               <span>Cápsula Celeste de Conexión</span>
               <span className="text-sky-400">•</span>
               <span className="text-sky-950">App Web Oficial</span>
@@ -893,8 +897,9 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           
           <div className="flex items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500 text-white text-xs font-bold shadow-xs">
-              FriendSearcher
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-500 text-white text-xs font-bold shadow-xs">
+              <img src="/logo.svg" alt="Logo" className="w-4 h-4 object-contain" />
+              <span>FriendSearcher</span>
             </div>
             <span className="text-sky-900 font-medium">• Datos en vivo de Google Cloud Firestore</span>
           </div>
