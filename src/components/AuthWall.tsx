@@ -17,6 +17,7 @@ import {
 } from '../firebase';
 import { AuthorizedEmail, SchoolSettings } from '../types';
 import { checkSchoolEmailAuthorizationAsync } from '../utils/schoolAuth';
+import { isDevAutoLoginEnabled, setDevExplicitlyLoggedOut } from '../utils/devAuth';
 
 interface AuthWallProps {
   onSuccess?: () => void;
@@ -47,7 +48,10 @@ export const AuthWall: React.FC<AuthWallProps> = ({
         setErrorMsg(validation.reason || 'Tu cuenta de Microsoft no figura en el padrón escolar autorizado.');
         return;
       }
-
+ 
+      if (isDevAutoLoginEnabled()) {
+        setDevExplicitlyLoggedOut(false);
+      }
       onSuccess?.();
     } catch (err: unknown) {
       console.error('Microsoft Sign-in error:', err);
@@ -78,6 +82,9 @@ export const AuthWall: React.FC<AuthWallProps> = ({
         return;
       }
 
+      if (isDevAutoLoginEnabled()) {
+        setDevExplicitlyLoggedOut(false);
+      }
       onSuccess?.();
     } catch (err: unknown) {
       console.error('Google Sign-in error:', err);
@@ -186,6 +193,23 @@ export const AuthWall: React.FC<AuthWallProps> = ({
               </>
             )}
           </button>
+
+          {/* Dev-only Auto-Login Button */}
+          {isDevAutoLoginEnabled() && (
+            <button
+              id="btn-dev-quick-login"
+              type="button"
+              onClick={() => {
+                setDevExplicitlyLoggedOut(false);
+                onSuccess?.();
+                window.location.reload();
+              }}
+              className="w-full py-2.5 px-4 rounded-2xl border border-dashed border-amber-500 bg-amber-50 hover:bg-amber-100 text-amber-950 text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xs"
+            >
+              <Sparkles className="w-4 h-4 text-amber-600" />
+              <span>Entrar como j.ipar@elbiofernandez.edu.uy (Dev Admin)</span>
+            </button>
+          )}
 
           {/* Trust badge */}
           <div className="mt-6 pt-4 border-t border-sky-200/60 flex items-center justify-center gap-1.5 text-[11px] text-sky-800 font-medium">

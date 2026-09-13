@@ -4,6 +4,7 @@ import { auth, googleProvider, microsoftProvider, signInWithPopup, signOut, User
 import { isUserAdmin } from '../config/admin';
 import { AuthorizedEmail, SchoolSettings } from '../types';
 import { validateSchoolEmail, checkSchoolEmailAuthorizationAsync } from '../utils/schoolAuth';
+import { isDevAutoLoginEnabled, setDevExplicitlyLoggedOut } from '../utils/devAuth';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -91,6 +92,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleSignOut = async () => {
     setLoading(true);
     try {
+      if (isDevAutoLoginEnabled()) {
+        setDevExplicitlyLoggedOut(true);
+      }
       await signOut(auth);
       onClose();
     } catch (err) {

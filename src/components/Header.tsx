@@ -2,6 +2,7 @@ import React from 'react';
 import { Compass, UserPlus, Sparkles, MessageSquare, Compass as ExploreIcon, Cloud, User as UserIcon, Database, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { User } from '../firebase';
 import { isUserAdmin } from '../config/admin';
+import { isDevAutoLoginEnabled } from '../utils/devAuth';
 
 interface HeaderProps {
   onOpenCreateModal: () => void;
@@ -79,6 +80,16 @@ export const Header: React.FC<HeaderProps> = ({
                   Admin
                 </span>
               </button>
+            )}
+            {isDevAutoLoginEnabled() && (
+              <div 
+                id="dev-mode-indicator"
+                className="hidden sm:inline-flex items-center gap-1.5 bg-amber-400 text-amber-950 border border-amber-500/80 px-2.5 py-1 rounded-full text-xs font-black shadow-xs select-none"
+                title="Sesión automática de desarrollo activa: j.ipar@elbiofernandez.edu.uy (Admin)"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-900" />
+                <span>Dev: j.ipar (Admin)</span>
+              </div>
             )}
           </nav>
         </div>
