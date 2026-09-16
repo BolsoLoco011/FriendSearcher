@@ -22,13 +22,17 @@ import {
   AlertCircle,
   Edit3,
   Save,
-  Utensils
+  Utensils,
+  Clock,
+  User as UserIcon,
+  CheckCircle2
 } from 'lucide-react';
 import { db, doc, deleteDoc, setDoc, updateDoc, collection, User } from '../firebase';
 import { FriendProfile, MemeItem, CookingItem, EventItem, GroupItem, GymItem, AuthorizedEmail, SchoolSettings } from '../types';
 import { INITIAL_FRIENDS } from '../data/mockData';
 import { unifyDuplicateProfiles } from '../utils/unifyProfiles';
 import { isUserAdmin, canRevokeAdmin, DEFAULT_ADMIN_EMAIL, TESTING_ADMIN_EMAIL, isTestingEnvironment } from '../config/admin';
+import { SCHOOL_CONFIG } from '../config/schoolConfig';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 interface FirestoreManagerModalProps {
@@ -51,9 +55,10 @@ interface FirestoreManagerModalProps {
   onUpdateUserAdminRole?: (userId: string, newIsAdmin: boolean, userEmail?: string) => Promise<void>;
   onUpdateUserProfile?: (userId: string, data: Partial<FriendProfile>) => Promise<void>;
   initialEditingUserId?: string | null;
+  initialTab?: TabCollection;
 }
 
-type TabCollection = 'users' | 'authorized_emails' | 'school_settings' | 'memes' | 'cooking' | 'events' | 'groups' | 'gym';
+type TabCollection = 'users' | 'pending_requests' | 'authorized_emails' | 'school_settings' | 'memes' | 'cooking' | 'events' | 'groups' | 'gym';
 
 export const FirestoreManagerModal: React.FC<FirestoreManagerModalProps> = ({
   isOpen,
@@ -75,12 +80,22 @@ export const FirestoreManagerModal: React.FC<FirestoreManagerModalProps> = ({
   onUpdateUserAdminRole,
   onUpdateUserProfile,
   initialEditingUserId,
+  initialTab,
 }) => {
-  const [selectedCol, setSelectedCol] = useState<TabCollection>('users');
+  const [selectedCol, setSelectedCol] = useState<TabCollection>(initialTab || 'users');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [selectedDocPreview, setSelectedDocPreview] = useState<any | null>(null);
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
+
+  // Pending approval list
+  const pendingUsers = friends.filter(f => f.approvalStatus === 'pending');
+
+  React.useEffect(() => {
+    if (isOpen && initialTab) {
+      setSelectedCol(initialTab);
+    }
+  }, [isOpen, initialTab]);
 
   // User editing states
   const [editingUser, setEditingUser] = useState<FriendProfile | null>(null);
@@ -114,6 +129,52 @@ export const FirestoreManagerModal: React.FC<FirestoreManagerModalProps> = ({
   React.useEffect(() => {
     setLocalSettings(schoolSettings);
   }, [schoolSettings]);
+
+  const handleApproveUser = async (userProfile: FriendProfile) => {
+    setActionLoadingId(userProfile.id);
+    try {
+      const now = new Date().toISOString();
+      await setDoc(doc(db, 'users', userProfile.id), {
+        approvalStatus: 'approved',
+        approvedAt: now,
+        approvedBy: currentUser?.email || 'admin',
+        updatedAt: now,
+      }, { merge: true });
+
+      const emailToUse = userProfile.email || `${(userProfile.name || userProfile.realName || 'alumno').toLowerCase().replace(/[^a-z0-9]/g, '')}@friendsearcher.local`;
+      const safeId = emailToUse.replace(/[^a-zA-Z0-9]/g, '_');
+      await setDoc(doc(db, 'authorized_emails', safeId), {
+        id: safeId,
+        email: emailToUse,
+        role: 'user',
+        notes: `Aprobado manualmente por ${currentUser?.email || 'admin'}`,
+        createdAt: now,
+      }, { merge: true });
+
+      showFeedback(`¡Alumno "${userProfile.name || userProfile.realName || userProfile.email}" aprobado con éxito!`);
+      onRefresh();
+    } catch (err) {
+      console.error('Error approving user:', err);
+      showFeedback('Error al aprobar alumno.');
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleRejectUser = async (userProfile: FriendProfile) => {
+    if (!window.confirm(`¿Rechazar la solicitud de ${userProfile.name || userProfile.realName || userProfile.email}?`)) return;
+    setActionLoadingId(userProfile.id);
+    try {
+      await deleteDoc(doc(db, 'users', userProfile.id));
+      showFeedback(`Solicitud rechazada.`);
+      onRefresh();
+    } catch (err) {
+      console.error('Error rejecting user:', err);
+      showFeedback('Error al rechazar solicitud.');
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -496,6 +557,26 @@ export const FirestoreManagerModal: React.FC<FirestoreManagerModalProps> = ({
             </span>
           </button>
 
+          {/* Pending Approval Requests */}
+          <button
+            onClick={() => { setSelectedCol('pending_requests'); setSelectedDocPreview(null); }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+              selectedCol === 'pending_requests' 
+                ? 'bg-amber-600 text-white shadow-xs' 
+                : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300'
+            }`}
+          >
+            <Clock className="w-3.5 h-3.5" />
+            <span>Solicitudes Pendientes</span>
+            {pendingUsers.length > 0 && (
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
+                selectedCol === 'pending_requests' ? 'bg-white/30 text-white' : 'bg-amber-500 text-white animate-pulse'
+              }`}>
+                {pendingUsers.length}
+              </span>
+            )}
+          </button>
+
           {/* School Whitelist */}
           <button
             onClick={() => { setSelectedCol('authorized_emails'); setSelectedDocPreview(null); }}
@@ -552,7 +633,88 @@ export const FirestoreManagerModal: React.FC<FirestoreManagerModalProps> = ({
         </div>
 
         {/* Content Body */}
-        {selectedCol === 'school_settings' ? (
+        {selectedCol === 'pending_requests' ? (
+          /* PENDING REQUESTS TAB */
+          <div className="p-6 overflow-y-auto space-y-5 max-h-[500px]">
+            <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 sm:p-5 flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-slate-900">Cola de Solicitudes Escolares</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Alumnos o docentes registrados que esperan verificación presencial en el colegio. Puedes aprobarlos con un clic para que ingresen de inmediato a FriendSearcher.
+                </p>
+              </div>
+            </div>
+
+            {pendingUsers.length === 0 ? (
+              <div className="text-center py-12 bg-slate-50 rounded-2xl border border-slate-200 text-slate-500 space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
+                <p className="text-xs font-bold text-slate-700">No hay solicitudes pendientes en este momento</p>
+                <p className="text-[11px] text-slate-400">Todos los alumnos registrados cuentan con acceso autorizado.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {pendingUsers.map(user => (
+                  <div 
+                    key={user.id}
+                    className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs hover:border-amber-300 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-full overflow-hidden bg-slate-100 ring-2 ring-amber-200 shrink-0 flex items-center justify-center">
+                        {user.avatar ? (
+                          <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <UserIcon className="w-5 h-5 text-slate-400" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h5 className="text-xs font-bold text-slate-900">{user.name || user.realName || 'Alumno'}</h5>
+                          {user.gradeOrClass && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-100 text-sky-800 font-bold">
+                              {user.gradeOrClass}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-0.5 font-mono">
+                          {user.email || user.id}
+                        </p>
+                        {user.requestedAt && (
+                          <p className="text-[10px] text-amber-700 font-medium mt-0.5">
+                            Solicitado el {new Date(user.requestedAt).toLocaleString()}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleRejectUser(user)}
+                        disabled={actionLoadingId === user.id}
+                        className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-rose-50 hover:text-rose-700 text-slate-600 text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Rechazar</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleApproveUser(user)}
+                        disabled={actionLoadingId === user.id}
+                        className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Aprobar Alumno</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : selectedCol === 'school_settings' ? (
           /* SCHOOL POLICIES TAB */
           <div className="p-6 overflow-y-auto space-y-6 max-h-[500px]">
             <div className="bg-sky-50/60 border border-sky-200 rounded-2xl p-4 sm:p-5 flex items-start gap-4">
@@ -562,7 +724,7 @@ export const FirestoreManagerModal: React.FC<FirestoreManagerModalProps> = ({
               <div className="space-y-1">
                 <h4 className="text-sm font-bold text-slate-900">Políticas de Registro y Acceso Escolar</h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Configura cómo la escuela controla el acceso de alumnos y docentes. Puedes exigir que estén en el padrón de correos autorizados o habilitar un dominio institucional corporativo/educativo de Microsoft o Google.
+                  Configura cómo la escuela controla el acceso de alumnos y docentes. Puedes exigir que estén en el padrón de correos autorizados, activar la auto-aprobación por código escolar o habilitar un dominio institucional.
                 </p>
               </div>
             </div>
@@ -593,7 +755,7 @@ export const FirestoreManagerModal: React.FC<FirestoreManagerModalProps> = ({
                 </div>
                 <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                   Estado: <strong className={localSettings.enforceWhitelist ? 'text-indigo-600' : 'text-slate-600'}>
-                    {localSettings.enforceWhitelist ? 'Activado (Cuentas no autorizadas son bloqueadas)' : 'Desactivado (Cualquiera puede crear cuenta)'}
+                    {localSettings.enforceWhitelist ? 'Activado (Cuentas no autorizadas pasan a revisión)' : 'Desactivado (Cualquiera puede crear cuenta)'}
                   </strong>
                 </div>
               </div>
@@ -602,17 +764,84 @@ export const FirestoreManagerModal: React.FC<FirestoreManagerModalProps> = ({
               <div className="border border-slate-200 rounded-2xl p-5 bg-white space-y-3">
                 <h5 className="text-xs font-bold text-slate-800">Dominio Institucional Escolar (Opcional)</h5>
                 <p className="text-[11px] text-slate-500">
-                  Cualquier cuenta de Microsoft o Google con este dominio podrá acceder automáticamente (ej: <code>@escuela.edu</code>).
+                  Cualquier cuenta con este dominio podrá acceder automáticamente (ej: <code>@elbiofernandez.edu.uy</code>).
                 </p>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
-                    placeholder="@escuela.edu o @colegio.edu.ar"
+                    placeholder="@elbiofernandez.edu.uy"
                     value={localSettings.allowedDomain || ''}
                     onChange={(e) => setLocalSettings(s => ({ ...s, allowedDomain: e.target.value }))}
                     className="flex-1 px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* School Code Settings Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Auto-Approve with School Code Toggle */}
+              <div className="border border-slate-200 rounded-2xl p-5 bg-white space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h5 className="text-xs font-bold text-slate-800">Auto-aprobación con Código Escolar</h5>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Si está activado, los alumnos que ingresen el código escolar válido son aprobados automáticamente sin esperar en la cola.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setLocalSettings(s => ({ ...s, autoApproveWithSchoolCode: !(s.autoApproveWithSchoolCode ?? true) }))}
+                    className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer ${
+                      (localSettings.autoApproveWithSchoolCode ?? true) ? 'bg-emerald-600' : 'bg-slate-300'
+                    }`}
+                  >
+                    <span 
+                      className={`block w-4 h-4 rounded-full bg-white transition-transform transform ${
+                        (localSettings.autoApproveWithSchoolCode ?? true) ? 'translate-x-7' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+                <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  Estado: <strong className={(localSettings.autoApproveWithSchoolCode ?? true) ? 'text-emerald-700' : 'text-slate-600'}>
+                    {(localSettings.autoApproveWithSchoolCode ?? true) ? 'Activado (Código aprueba automáticamente)' : 'Desactivado (Solo revisión manual)'}
+                  </strong>
+                </div>
+              </div>
+
+              {/* School Code Input / Rotation */}
+              <div className="border border-slate-200 rounded-2xl p-5 bg-white space-y-3">
+                <h5 className="text-xs font-bold text-slate-800">Código Escolar Activo (Rotativo)</h5>
+                <p className="text-[11px] text-slate-500">
+                  Código que se comparte en clase o en el recreo. Cámbialo aquí cuando desees rotarlo por seguridad.
+                </p>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Ej: El recreo FriendSearcher"
+                    value={localSettings.schoolCode ?? SCHOOL_CONFIG.defaultSchoolCode}
+                    onChange={(e) => setLocalSettings(s => ({ ...s, schoolCode: e.target.value }))}
+                    className="flex-1 px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:border-emerald-500 font-semibold"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Admin Contact Name Setting */}
+            <div className="border border-slate-200 rounded-2xl p-5 bg-white space-y-3">
+              <h5 className="text-xs font-bold text-slate-800">Nombre del Administrador de Contacto</h5>
+              <p className="text-[11px] text-slate-500">
+                Nombre que se mostrará en los mensajes para los alumnos que están esperando en la cola (ej: "Pídele a Juan Manuel en el recreo").
+              </p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Ej: Juan Manuel"
+                  value={localSettings.adminContactName ?? SCHOOL_CONFIG.adminContactName}
+                  onChange={(e) => setLocalSettings(s => ({ ...s, adminContactName: e.target.value }))}
+                  className="flex-1 max-w-sm px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:border-sky-500 font-semibold"
+                />
               </div>
             </div>
 

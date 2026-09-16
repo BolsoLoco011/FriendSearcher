@@ -98,19 +98,20 @@ export function validateSchoolEmail(
 export async function checkSchoolEmailAuthorizationAsync(
   email: string | null | undefined,
   cachedWhitelist?: AuthorizedEmail[],
-  cachedSettings?: SchoolSettings
+  cachedSettings?: SchoolSettings,
+  userId?: string
 ): Promise<SchoolAuthValidationResult> {
-  if (!email) {
+  if (!email && !userId) {
     return {
       isAllowed: false,
-      reason: 'No se detectó un correo electrónico válido.'
+      reason: 'No se detectó un correo electrónico ni usuario válido.'
     };
   }
 
-  const cleanEmail = email.toLowerCase().trim();
+  const cleanEmail = (email || '').toLowerCase().trim();
 
   // 1. Master admin check
-  if (cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase()) {
+  if (cleanEmail && cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase()) {
     return {
       isAllowed: true,
       isAdmin: true,
@@ -119,7 +120,7 @@ export async function checkSchoolEmailAuthorizationAsync(
   }
 
   // 1.1 Testing admin check (friendsearchertesting.ai.studio / localhost)
-  if (isTestingEnvironment() && cleanEmail === TESTING_ADMIN_EMAIL.toLowerCase()) {
+  if (cleanEmail && isTestingEnvironment() && cleanEmail === TESTING_ADMIN_EMAIL.toLowerCase()) {
     return {
       isAllowed: true,
       isAdmin: true,
@@ -127,8 +128,27 @@ export async function checkSchoolEmailAuthorizationAsync(
     };
   }
 
+  // 1.2 Check user profile document in Firestore if userId is provided
+  if (userId) {
+    try {
+      const userSnap = await getDoc(doc(db, 'users', userId));
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        if (userData.approvalStatus === 'approved') {
+          return {
+            isAllowed: true,
+            isAdmin: userData.isAdmin === true || userData.role === 'admin',
+            reason: 'Cuenta aprobada en la comunidad escolar.'
+          };
+        }
+      }
+    } catch (e) {
+      console.warn('Error checking user profile approval status:', e);
+    }
+  }
+
   // 2. Fast check with cached whitelist if available
-  if (cachedWhitelist && cachedWhitelist.length > 0) {
+  if (cachedWhitelist && cachedWhitelist.length > 0 && cleanEmail) {
     const quickResult = validateSchoolEmail(email, cachedWhitelist, cachedSettings);
     if (quickResult.isAllowed) {
       return quickResult;
@@ -157,7 +177,7 @@ export async function checkSchoolEmailAuthorizationAsync(
 
     // Check domain pattern (defaults to @elbiofernandez.edu.uy)
     const configuredDomain = settings.allowedDomain?.trim() || DEFAULT_SCHOOL_DOMAIN;
-    if (configuredDomain) {
+    if (configuredDomain && cleanEmail) {
       let domainPattern = configuredDomain.toLowerCase().trim();
       if (!domainPattern.startsWith('@')) domainPattern = '@' + domainPattern;
       if (cleanEmail.endsWith(domainPattern)) {
@@ -169,36 +189,38 @@ export async function checkSchoolEmailAuthorizationAsync(
     }
 
     // Direct check by safe ID
-    const safeId = cleanEmail.replace(/[^a-zA-Z0-9]/g, '_');
-    const directDoc = await getDoc(doc(db, 'authorized_emails', safeId));
-    if (directDoc.exists()) {
-      const data = directDoc.data() as AuthorizedEmail;
-      return {
-        isAllowed: true,
-        matchedEmail: data,
-        isAdmin: data.role === 'admin',
-        reason: `Correo ${cleanEmail} encontrado en el padrón escolar de Firestore.`
-      };
-    }
-
-    // Also check direct collection iteration in case the document was saved with another ID
-    const snap = await getDocs(collection(db, 'authorized_emails'));
-    for (const d of snap.docs) {
-      const item = d.data() as AuthorizedEmail;
-      const itemEmail = (item.email || '').toLowerCase().trim();
-      if (itemEmail === cleanEmail || d.id === safeId || d.id.toLowerCase() === cleanEmail) {
+    if (cleanEmail) {
+      const safeId = cleanEmail.replace(/[^a-zA-Z0-9]/g, '_');
+      const directDoc = await getDoc(doc(db, 'authorized_emails', safeId));
+      if (directDoc.exists()) {
+        const data = directDoc.data() as AuthorizedEmail;
         return {
           isAllowed: true,
-          matchedEmail: { ...item, id: d.id },
-          isAdmin: item.role === 'admin',
+          matchedEmail: data,
+          isAdmin: data.role === 'admin',
           reason: `Correo ${cleanEmail} encontrado en el padrón escolar de Firestore.`
         };
+      }
+
+      // Also check direct collection iteration in case the document was saved with another ID
+      const snap = await getDocs(collection(db, 'authorized_emails'));
+      for (const d of snap.docs) {
+        const item = d.data() as AuthorizedEmail;
+        const itemEmail = (item.email || '').toLowerCase().trim();
+        if (itemEmail === cleanEmail || d.id === safeId || d.id.toLowerCase() === cleanEmail) {
+          return {
+            isAllowed: true,
+            matchedEmail: { ...item, id: d.id },
+            isAdmin: item.role === 'admin',
+            reason: `Correo ${cleanEmail} encontrado en el padrón escolar de Firestore.`
+          };
+        }
       }
     }
 
     return {
       isAllowed: false,
-      reason: `El correo ${cleanEmail} no figura en el padrón escolar autorizado.`
+      reason: `El usuario no figura como aprobado en el padrón escolar.`
     };
   } catch (err) {
     console.error('Error fetching authorized_emails directly from Firestore:', err);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, UserPlus, Sparkles, MessageSquare, Compass as ExploreIcon, Cloud, User as UserIcon, Database, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Compass, UserPlus, Sparkles, MessageSquare, Compass as ExploreIcon, Cloud, User as UserIcon, Database, ShieldAlert, ShieldCheck, Clock } from 'lucide-react';
 import { User } from '../firebase';
 import { isUserAdmin } from '../config/admin';
 import { isDevAutoLoginEnabled } from '../utils/devAuth';
@@ -9,6 +9,8 @@ interface HeaderProps {
   onOpenAuthModal: () => void;
   onOpenDbManager?: () => void;
   onOpenCaracteristicas?: () => void;
+  onOpenPendingRequests?: () => void;
+  pendingRequestsCount?: number;
   currentUser: User | null;
   connectionsCount: number;
   totalFriends: number;
@@ -21,6 +23,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAuthModal,
   onOpenDbManager,
   onOpenCaracteristicas,
+  onOpenPendingRequests,
+  pendingRequestsCount = 0,
   currentUser,
   connectionsCount,
   totalFriends,
@@ -79,6 +83,17 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="bg-amber-400 text-amber-950 text-[10px] font-black px-1.5 py-0.2 rounded uppercase tracking-wider">
                   Admin
                 </span>
+              </button>
+            )}
+            {isAdmin && pendingRequestsCount > 0 && onOpenPendingRequests && (
+              <button
+                id="btn-admin-pending-badge"
+                onClick={onOpenPendingRequests}
+                className="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black text-xs px-3 py-1 rounded-full border border-amber-500 shadow-sm transition-all cursor-pointer flex items-center gap-1.5 animate-pulse"
+                title={`${pendingRequestsCount} solicitud(es) de alumno(s) pendiente(s) de aprobación`}
+              >
+                <Clock className="w-3.5 h-3.5 text-amber-950" />
+                <span>{pendingRequestsCount} pendiente{pendingRequestsCount > 1 ? 's' : ''}</span>
               </button>
             )}
             {isDevAutoLoginEnabled() && (

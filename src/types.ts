@@ -33,6 +33,13 @@ export interface FriendProfile {
   isAdmin?: boolean;
   role?: 'admin' | 'user';
   profileCompleted?: boolean;
+  approvalStatus?: 'pending' | 'approved' | 'rejected';
+  schoolCodeUsed?: boolean;
+  gradeOrClass?: string;
+  realName?: string;
+  requestedAt?: string;
+  approvedAt?: string;
+  approvedBy?: string;
   updatedAt?: string;
   createdAt?: string;
 }
@@ -97,6 +104,9 @@ export interface SchoolSettings {
   allowedDomain?: string; // ej: 'escuela.edu' o 'colegio.edu.uy'
   schoolName?: string;
   updatedAt?: string;
+  autoApproveWithSchoolCode?: boolean;
+  schoolCode?: string;
+  adminContactName?: string;
 }
 
 export interface GymItem {

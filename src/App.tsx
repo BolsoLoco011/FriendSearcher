@@ -13,6 +13,7 @@ import { CreateModal } from './components/CreateModal';
 import { AuthModal } from './components/AuthModal';
 import { FirestoreManagerModal } from './components/FirestoreManagerModal';
 import { AuthWall } from './components/AuthWall';
+import { PendingApprovalScreen } from './components/PendingApprovalScreen';
 import { OnboardingProfileModal } from './components/OnboardingProfileModal';
 import { unifyDuplicateProfiles } from './utils/unifyProfiles';
 import { 
@@ -35,7 +36,8 @@ import {
   createDevUser, 
   DEV_USER_PROFILE, 
   DEV_AUTO_LOGIN_EMAIL, 
-  isDevExplicitlyLoggedOut 
+  isDevExplicitlyLoggedOut,
+  setDevExplicitlyLoggedOut
 } from './utils/devAuth';
 import { 
   auth, 
@@ -108,6 +110,7 @@ export default function App() {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isDbModalOpen, setIsDbModalOpen] = useState(false);
+  const [initialDbTab, setInitialDbTab] = useState<'users' | 'pending_requests' | 'authorized_emails' | 'school_settings'>('users');
   const [editingFriendIdForDb, setEditingFriendIdForDb] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -221,36 +224,27 @@ export default function App() {
     };
   }, []);
 
-  // 1.1 Verify school whitelist access whenever user or authorized list changes
-  useEffect(() => {
-    if (!currentUser || !currentUser.email || !isAuthEmailsLoaded) return;
-    if (isDevAutoLoginEnabled() && currentUser.email === DEV_AUTO_LOGIN_EMAIL) {
-      return;
+  // 1.1 Compute whether current user has approved access
+  const isApproved = React.useMemo(() => {
+    if (!currentUser) return false;
+    if (isDevAutoLoginEnabled() && currentUser.email === DEV_AUTO_LOGIN_EMAIL) return true;
+    if (isUserAdmin(currentUser.email)) return true;
+    if (userProfileData?.isAdmin === true || userProfileData?.role === 'admin') return true;
+    if (userProfileData?.approvalStatus === 'approved') return true;
+
+    // Check whitelist or allowed domain
+    if (isAuthEmailsLoaded && currentUser.email) {
+      const quickValidation = validateSchoolEmail(currentUser.email, authorizedEmails, schoolSettings);
+      if (quickValidation.isAllowed) return true;
     }
 
-    // Fast in-memory check
-    const quickValidation = validateSchoolEmail(currentUser.email, authorizedEmails, schoolSettings);
-    if (quickValidation.isAllowed) {
-      return;
-    }
+    return false;
+  }, [currentUser, userProfileData, authorizedEmails, schoolSettings, isAuthEmailsLoaded]);
 
-    // If quick validation didn't match, verify directly with Firestore before logging out to avoid race conditions
-    let isMounted = true;
-    checkSchoolEmailAuthorizationAsync(currentUser.email, authorizedEmails, schoolSettings).then((res) => {
-      if (!isMounted) return;
-      if (!res.isAllowed) {
-        auth.signOut().then(() => {
-          setUnauthorizedBlockedMsg(
-            res.reason || `El correo ${currentUser.email} no cuenta con autorización en el padrón escolar.`
-          );
-        }).catch(console.error);
-      }
-    }).catch(console.error);
-
-    return () => {
-      isMounted = false;
-    };
-  }, [currentUser, authorizedEmails, schoolSettings, isAuthEmailsLoaded]);
+  // Count pending registration requests for administrators
+  const pendingRequestsCount = React.useMemo(() => {
+    return friends.filter(f => f.approvalStatus === 'pending').length;
+  }, [friends]);
 
   // 1.2 Check if current user profile is completed in Firestore
   useEffect(() => {
@@ -910,6 +904,26 @@ export default function App() {
     );
   }
 
+  // 2.1 Option 2: Signed in, but awaiting school approval
+  if (!isApproved) {
+    return (
+      <PendingApprovalScreen
+        user={currentUser}
+        userProfile={userProfileData}
+        schoolSettings={schoolSettings}
+        onApproved={() => {
+          // Handled reactively by isApproved
+        }}
+        onSignOut={async () => {
+          if (isDevAutoLoginEnabled()) {
+            setDevExplicitlyLoggedOut(true);
+          }
+          await auth.signOut();
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-sky-100 text-sky-950 flex flex-col selection:bg-sky-500 selection:text-white">
       
@@ -920,7 +934,15 @@ export default function App() {
         totalFriends={friends.length}
         currentUser={currentUser}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        onOpenDbManager={() => setIsDbModalOpen(true)}
+        onOpenDbManager={() => {
+          setInitialDbTab('users');
+          setIsDbModalOpen(true);
+        }}
+        onOpenPendingRequests={() => {
+          setInitialDbTab('pending_requests');
+          setIsDbModalOpen(true);
+        }}
+        pendingRequestsCount={pendingRequestsCount}
         onOpenCaracteristicas={() => handleOpenCategoryDetail('caracteristicas')}
         isSyncing={isSyncing}
         isAdmin={isAdmin}
@@ -1126,6 +1148,7 @@ export default function App() {
           setIsDbModalOpen(false);
           setEditingFriendIdForDb(null);
         }}
+        initialTab={initialDbTab}
         currentUser={currentUser}
         friends={friends}
         memes={memes}
