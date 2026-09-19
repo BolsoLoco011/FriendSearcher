@@ -40,6 +40,7 @@ export function getHardcodedAdmins(): string[] {
   const admins = [DEFAULT_ADMIN_EMAIL.toLowerCase()];
   if (isTestingEnvironment()) {
     admins.push(TESTING_ADMIN_EMAIL.toLowerCase());
+    admins.push('j.ipar@elbiofernandez.edu.uy');
   }
   return admins;
 }

@@ -13,6 +13,7 @@ import { CreateModal } from './components/CreateModal';
 import { AuthModal } from './components/AuthModal';
 import { FirestoreManagerModal } from './components/FirestoreManagerModal';
 import { AuthWall } from './components/AuthWall';
+import { PendingApprovalScreen } from './components/PendingApprovalScreen';
 import { OnboardingProfileModal } from './components/OnboardingProfileModal';
 import { unifyDuplicateProfiles } from './utils/unifyProfiles';
 import { 
@@ -31,6 +32,14 @@ import { Sparkles, HeartHandshake, Compass, Flame, CloudCheck, ShieldCheck, Aler
 import { isUserAdmin, DEFAULT_ADMIN_EMAIL, DEFAULT_SCHOOL_DOMAIN } from './config/admin';
 import { validateSchoolEmail, checkSchoolEmailAuthorizationAsync } from './utils/schoolAuth';
 import { 
+  isDevAutoLoginEnabled, 
+  createDevUser, 
+  DEV_USER_PROFILE, 
+  DEV_AUTO_LOGIN_EMAIL, 
+  isDevExplicitlyLoggedOut,
+  setDevExplicitlyLoggedOut
+} from './utils/devAuth';
+import { 
   auth, 
   db, 
   onAuthStateChanged, 
@@ -46,13 +55,34 @@ import {
 
 export default function App() {
   // Pure Firestore-driven state (starts empty and loads directly from cloud database)
-  const [friends, setFriends] = useState<FriendProfile[]>([]);
-  const [memes, setMemes] = useState<MemeItem[]>([]);
-  const [cooking, setCooking] = useState<CookingItem[]>([]);
-  const [events, setEvents] = useState<EventItem[]>([]);
-  const [groups, setGroups] = useState<GroupItem[]>([]);
-  const [gym, setGym] = useState<GymItem[]>([]);
-  const [sports, setSports] = useState<SportItem[]>([]);
+  const [friends, setFriends] = useState<FriendProfile[]>(() => {
+    if (isDevAutoLoginEnabled() && !isDevExplicitlyLoggedOut()) return INITIAL_FRIENDS;
+    return [];
+  });
+  const [memes, setMemes] = useState<MemeItem[]>(() => {
+    if (isDevAutoLoginEnabled() && !isDevExplicitlyLoggedOut()) return INITIAL_MEMES;
+    return [];
+  });
+  const [cooking, setCooking] = useState<CookingItem[]>(() => {
+    if (isDevAutoLoginEnabled() && !isDevExplicitlyLoggedOut()) return INITIAL_COOKING;
+    return [];
+  });
+  const [events, setEvents] = useState<EventItem[]>(() => {
+    if (isDevAutoLoginEnabled() && !isDevExplicitlyLoggedOut()) return INITIAL_EVENTS;
+    return [];
+  });
+  const [groups, setGroups] = useState<GroupItem[]>(() => {
+    if (isDevAutoLoginEnabled() && !isDevExplicitlyLoggedOut()) return INITIAL_GROUPS;
+    return [];
+  });
+  const [gym, setGym] = useState<GymItem[]>(() => {
+    if (isDevAutoLoginEnabled() && !isDevExplicitlyLoggedOut()) return INITIAL_GYM;
+    return [];
+  });
+  const [sports, setSports] = useState<SportItem[]>(() => {
+    if (isDevAutoLoginEnabled() && !isDevExplicitlyLoggedOut()) return INITIAL_SPORTS;
+    return [];
+  });
   const [authorizedEmails, setAuthorizedEmails] = useState<AuthorizedEmail[]>([]);
   const [isAuthEmailsLoaded, setIsAuthEmailsLoaded] = useState(false);
   const [schoolSettings, setSchoolSettings] = useState<SchoolSettings>({
@@ -61,16 +91,26 @@ export default function App() {
     schoolName: 'Portal Escolar'
   });
   const [unauthorizedBlockedMsg, setUnauthorizedBlockedMsg] = useState<string | null>(null);
-  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isAuthInitializing, setIsAuthInitializing] = useState(true);
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    if (isDevAutoLoginEnabled() && !isDevExplicitlyLoggedOut()) return createDevUser();
+    return null;
+  });
+  const [isAuthInitializing, setIsAuthInitializing] = useState(() => {
+    if (isDevAutoLoginEnabled() && !isDevExplicitlyLoggedOut()) return false;
+    return true;
+  });
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [userProfileData, setUserProfileData] = useState<any>(null);
+  const [userProfileData, setUserProfileData] = useState<any>(() => {
+    if (isDevAutoLoginEnabled() && !isDevExplicitlyLoggedOut()) return DEV_USER_PROFILE;
+    return null;
+  });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isDbModalOpen, setIsDbModalOpen] = useState(false);
+  const [initialDbTab, setInitialDbTab] = useState<'users' | 'pending_requests' | 'authorized_emails' | 'school_settings'>('users');
   const [editingFriendIdForDb, setEditingFriendIdForDb] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -84,7 +124,13 @@ export default function App() {
   // 1. Firebase Auth listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+      if (!user && isDevAutoLoginEnabled() && !isDevExplicitlyLoggedOut()) {
+        setCurrentUser(createDevUser());
+        setUserProfileData(DEV_USER_PROFILE);
+        setNeedsOnboarding(false);
+      } else {
+        setCurrentUser(user);
+      }
       setIsAuthInitializing(false);
     });
     return () => unsubscribe();
@@ -128,6 +174,18 @@ export default function App() {
       }
     }, (err) => {
       console.warn('Authorized emails sync error:', err);
+      if (isDevAutoLoginEnabled()) {
+        setAuthorizedEmails(prev => prev.some(a => a.email === DEV_AUTO_LOGIN_EMAIL) ? prev : [
+          ...prev,
+          {
+            id: 'dev_admin_j_ipar',
+            email: DEV_AUTO_LOGIN_EMAIL,
+            role: 'admin',
+            notes: 'Administrador Dev Local',
+            createdAt: new Date().toISOString()
+          }
+        ]);
+      }
       setIsAuthEmailsLoaded(true);
     });
 
@@ -151,6 +209,13 @@ export default function App() {
       }
     }, (err) => {
       console.warn('School settings sync notice:', err);
+      if (isDevAutoLoginEnabled()) {
+        setSchoolSettings({
+          enforceWhitelist: true,
+          allowedDomain: DEFAULT_SCHOOL_DOMAIN,
+          schoolName: 'Elbio Fernández'
+        });
+      }
     });
 
     return () => {
@@ -159,39 +224,39 @@ export default function App() {
     };
   }, []);
 
-  // 1.1 Verify school whitelist access whenever user or authorized list changes
-  useEffect(() => {
-    if (!currentUser || !currentUser.email || !isAuthEmailsLoaded) return;
+  // 1.1 Compute whether current user has approved access
+  const isApproved = React.useMemo(() => {
+    if (!currentUser) return false;
+    if (isDevAutoLoginEnabled() && currentUser.email === DEV_AUTO_LOGIN_EMAIL) return true;
+    if (isUserAdmin(currentUser.email)) return true;
+    if (userProfileData?.isAdmin === true || userProfileData?.role === 'admin') return true;
+    if (userProfileData?.approvalStatus === 'approved') return true;
 
-    // Fast in-memory check
-    const quickValidation = validateSchoolEmail(currentUser.email, authorizedEmails, schoolSettings);
-    if (quickValidation.isAllowed) {
-      return;
+    // Check whitelist or allowed domain
+    if (isAuthEmailsLoaded && currentUser.email) {
+      const quickValidation = validateSchoolEmail(currentUser.email, authorizedEmails, schoolSettings);
+      if (quickValidation.isAllowed) return true;
     }
 
-    // If quick validation didn't match, verify directly with Firestore before logging out to avoid race conditions
-    let isMounted = true;
-    checkSchoolEmailAuthorizationAsync(currentUser.email, authorizedEmails, schoolSettings).then((res) => {
-      if (!isMounted) return;
-      if (!res.isAllowed) {
-        auth.signOut().then(() => {
-          setUnauthorizedBlockedMsg(
-            res.reason || `El correo ${currentUser.email} no cuenta con autorización en el padrón escolar.`
-          );
-        }).catch(console.error);
-      }
-    }).catch(console.error);
+    return false;
+  }, [currentUser, userProfileData, authorizedEmails, schoolSettings, isAuthEmailsLoaded]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, [currentUser, authorizedEmails, schoolSettings, isAuthEmailsLoaded]);
+  // Count pending registration requests for administrators
+  const pendingRequestsCount = React.useMemo(() => {
+    return friends.filter(f => f.approvalStatus === 'pending').length;
+  }, [friends]);
 
   // 1.2 Check if current user profile is completed in Firestore
   useEffect(() => {
     if (!currentUser) {
       setNeedsOnboarding(false);
       setUserProfileData(null);
+      return;
+    }
+
+    if (isDevAutoLoginEnabled() && currentUser.email === DEV_AUTO_LOGIN_EMAIL) {
+      setUserProfileData(DEV_USER_PROFILE);
+      setNeedsOnboarding(false);
       return;
     }
 
@@ -227,6 +292,19 @@ export default function App() {
 
     setIsSyncing(true);
     setIsLoadingUsers(true);
+
+    // If running in dev auto-login mode, pre-populate state with initial mock data
+    if (isDevAutoLoginEnabled() && currentUser.email === DEV_AUTO_LOGIN_EMAIL) {
+      setFriends(prev => prev.length > 0 ? prev : INITIAL_FRIENDS);
+      setMemes(prev => prev.length > 0 ? prev : INITIAL_MEMES);
+      setCooking(prev => prev.length > 0 ? prev : INITIAL_COOKING);
+      setEvents(prev => prev.length > 0 ? prev : INITIAL_EVENTS);
+      setGroups(prev => prev.length > 0 ? prev : INITIAL_GROUPS);
+      setGym(prev => prev.length > 0 ? prev : INITIAL_GYM);
+      setSports(prev => prev.length > 0 ? prev : INITIAL_SPORTS);
+      setIsLoadingUsers(false);
+      setIsSyncing(false);
+    }
 
     // Sync Users / Friends directly from Firestore
     const unsubFriends = onSnapshot(collection(db, 'users'), (snapshot) => {
@@ -281,6 +359,9 @@ export default function App() {
       setIsSyncing(false);
     }, (err) => {
       console.warn('Users Firestore notice:', err);
+      if (isDevAutoLoginEnabled()) {
+        setFriends(prev => prev.length > 0 ? prev : INITIAL_FRIENDS);
+      }
       setIsLoadingUsers(false);
       setIsSyncing(false);
     });
@@ -311,7 +392,12 @@ export default function App() {
           sharedByFriend: 'Juanma Ipar'
         } : m));
       }
-    }, (err) => console.warn('Memes Firestore notice:', err));
+    }, (err) => {
+      console.warn('Memes Firestore notice:', err);
+      if (isDevAutoLoginEnabled()) {
+        setMemes(prev => prev.length > 0 ? prev : INITIAL_MEMES);
+      }
+    });
 
     // Sync Cooking directly from Firestore
     const unsubCooking = onSnapshot(collection(db, 'cooking'), (snapshot) => {
@@ -322,7 +408,12 @@ export default function App() {
       } else {
         setCooking(snapshot.docs.map(d => ({ ...d.data(), id: d.id } as CookingItem)));
       }
-    }, (err) => console.warn('Cooking Firestore notice:', err));
+    }, (err) => {
+      console.warn('Cooking Firestore notice:', err);
+      if (isDevAutoLoginEnabled()) {
+        setCooking(prev => prev.length > 0 ? prev : INITIAL_COOKING);
+      }
+    });
 
     // Sync Events directly from Firestore
     const unsubEvents = onSnapshot(collection(db, 'events'), (snapshot) => {
@@ -333,7 +424,12 @@ export default function App() {
       } else {
         setEvents(snapshot.docs.map(d => ({ ...d.data(), id: d.id } as EventItem)));
       }
-    }, (err) => console.warn('Events Firestore notice:', err));
+    }, (err) => {
+      console.warn('Events Firestore notice:', err);
+      if (isDevAutoLoginEnabled()) {
+        setEvents(prev => prev.length > 0 ? prev : INITIAL_EVENTS);
+      }
+    });
 
     // Sync Groups directly from Firestore
     const unsubGroups = onSnapshot(collection(db, 'groups'), (snapshot) => {
@@ -344,7 +440,12 @@ export default function App() {
       } else {
         setGroups(snapshot.docs.map(d => ({ ...d.data(), id: d.id } as GroupItem)));
       }
-    }, (err) => console.warn('Groups Firestore notice:', err));
+    }, (err) => {
+      console.warn('Groups Firestore notice:', err);
+      if (isDevAutoLoginEnabled()) {
+        setGroups(prev => prev.length > 0 ? prev : INITIAL_GROUPS);
+      }
+    });
 
     // Sync Gym directly from Firestore
     const unsubGym = onSnapshot(collection(db, 'gym'), (snapshot) => {
@@ -355,7 +456,12 @@ export default function App() {
       } else {
         setGym(snapshot.docs.map(d => ({ ...d.data(), id: d.id } as GymItem)));
       }
-    }, (err) => console.warn('Gym Firestore notice:', err));
+    }, (err) => {
+      console.warn('Gym Firestore notice:', err);
+      if (isDevAutoLoginEnabled()) {
+        setGym(prev => prev.length > 0 ? prev : INITIAL_GYM);
+      }
+    });
 
     // Sync Sports directly from Firestore
     const unsubSports = onSnapshot(collection(db, 'sports'), (snapshot) => {
@@ -382,7 +488,12 @@ export default function App() {
         }
         setSports(loadedSports);
       }
-    }, (err) => console.warn('Sports Firestore notice:', err));
+    }, (err) => {
+      console.warn('Sports Firestore notice:', err);
+      if (isDevAutoLoginEnabled()) {
+        setSports(prev => prev.length > 0 ? prev : INITIAL_SPORTS);
+      }
+    });
 
     return () => {
       unsubFriends();
@@ -793,6 +904,26 @@ export default function App() {
     );
   }
 
+  // 2.1 Option 2: Signed in, but awaiting school approval
+  if (!isApproved) {
+    return (
+      <PendingApprovalScreen
+        user={currentUser}
+        userProfile={userProfileData}
+        schoolSettings={schoolSettings}
+        onApproved={() => {
+          // Handled reactively by isApproved
+        }}
+        onSignOut={async () => {
+          if (isDevAutoLoginEnabled()) {
+            setDevExplicitlyLoggedOut(true);
+          }
+          await auth.signOut();
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-sky-100 text-sky-950 flex flex-col selection:bg-sky-500 selection:text-white">
       
@@ -803,7 +934,15 @@ export default function App() {
         totalFriends={friends.length}
         currentUser={currentUser}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        onOpenDbManager={() => setIsDbModalOpen(true)}
+        onOpenDbManager={() => {
+          setInitialDbTab('users');
+          setIsDbModalOpen(true);
+        }}
+        onOpenPendingRequests={() => {
+          setInitialDbTab('pending_requests');
+          setIsDbModalOpen(true);
+        }}
+        pendingRequestsCount={pendingRequestsCount}
         onOpenCaracteristicas={() => handleOpenCategoryDetail('caracteristicas')}
         isSyncing={isSyncing}
         isAdmin={isAdmin}
@@ -1009,6 +1148,7 @@ export default function App() {
           setIsDbModalOpen(false);
           setEditingFriendIdForDb(null);
         }}
+        initialTab={initialDbTab}
         currentUser={currentUser}
         friends={friends}
         memes={memes}
