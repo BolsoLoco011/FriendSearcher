@@ -147,7 +147,9 @@ export const AuthWall: React.FC<AuthWallProps> = ({
       if (code === 'auth/invalid-credential' || code === 'auth/user-not-found' || code === 'auth/wrong-password') {
         setErrorMsg('Usuario o contraseña incorrectos. Si aún no tienes cuenta, haz clic en "Crear cuenta".');
       } else if (code === 'auth/operation-not-allowed') {
-        setErrorMsg('El acceso con contraseña aún no está activado en Firebase. Por favor ingresa con Google.');
+        setErrorMsg('El acceso con contraseña aún no está activado en Firebase Console. Por favor ingresa con Google.');
+      } else if (code === 'auth/network-request-failed') {
+        setErrorMsg('Error de conexión con Firebase (network-request-failed). Verifica que "Email/Password" esté habilitado y el dominio esté autorizado en Firebase Console, o ingresa con Google.');
       } else if (code === 'auth/too-many-requests') {
         setErrorMsg('Demasiados intentos fallidos. Por favor espera unos momentos antes de reintentar.');
       } else {
@@ -246,6 +248,8 @@ export const AuthWall: React.FC<AuthWallProps> = ({
         setErrorMsg('Ese usuario ya existe. Prueba iniciar sesión o elige otro nombre de usuario.');
       } else if (code === 'auth/operation-not-allowed') {
         setErrorMsg('El registro con usuario y contraseña requiere habilitar "Email/Password" en Firebase Console. Por ahora puedes entrar con Google.');
+      } else if (code === 'auth/network-request-failed') {
+        setErrorMsg('Error de conexión con Firebase (network-request-failed). Verifica que el proveedor "Email/Password" esté habilitado en Firebase Console y tu navegador no bloquee la conexión, o ingresa con Google.');
       } else if (code === 'auth/weak-password') {
         setErrorMsg('La contraseña es muy débil. Debe tener al menos 6 caracteres.');
       } else {
