@@ -18,8 +18,9 @@ export const TESTING_ADMIN_EMAIL = 'ipar.fernando@gmail.com';
 export function isTestingEnvironment(): boolean {
   if (typeof window === 'undefined') return false;
   const hostname = window.location.hostname.toLowerCase();
-  // Production domain is strictly protected from testing rules
-  if (hostname === 'friendsearcherelef.ai.studio') return false;
+  // Production domains (freandsearcher.ai.studio, friendsearcherelef.ai.studio, etc.) are strictly protected
+  if (hostname.endsWith('.ai.studio') && hostname !== TESTING_DOMAIN) return false;
+  if (hostname === 'freandsearcher.ai.studio' || hostname === 'friendsearcherelef.ai.studio') return false;
   const isDev = Boolean((import.meta as { env?: { DEV?: boolean } })?.env?.DEV);
   return (
     hostname === TESTING_DOMAIN ||
