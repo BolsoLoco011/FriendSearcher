@@ -86,7 +86,7 @@ export const OnboardingProfileModal: React.FC<OnboardingProfileModalProps> = ({
   const [favoriteFood, setFavoriteFood] = useState(initialData?.favoriteFood || '');
   const [favoriteMemeStyle, setFavoriteMemeStyle] = useState(initialData?.favoriteMemeStyle || '');
   const [selectedTraits, setSelectedTraits] = useState<string[]>(
-    initialData?.traits && initialData.traits.length > 0 
+    Array.isArray(initialData?.traits) && initialData.traits.length > 0 
       ? initialData.traits 
       : ['VIDEOJUEGOS', 'MEMES']
   );
@@ -106,7 +106,7 @@ export const OnboardingProfileModal: React.FC<OnboardingProfileModalProps> = ({
       if (initialData.avatar) setAvatar(initialData.avatar);
       if (initialData.favoriteFood) setFavoriteFood(initialData.favoriteFood);
       if (initialData.favoriteMemeStyle) setFavoriteMemeStyle(initialData.favoriteMemeStyle);
-      if (initialData.traits && initialData.traits.length > 0) setSelectedTraits(initialData.traits);
+      if (Array.isArray(initialData.traits) && initialData.traits.length > 0) setSelectedTraits(initialData.traits);
     }
   }, [initialData, isOpen]);
 
@@ -439,6 +439,7 @@ export const OnboardingProfileModal: React.FC<OnboardingProfileModalProps> = ({
           {/* 7. Foto de Perfil */}
           <div className="pt-1">
             <ImageUploadField
+              id="onboarding-avatar"
               label="Foto de perfil o Avatar"
               value={avatar}
               onChange={setAvatar}

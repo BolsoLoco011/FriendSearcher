@@ -129,8 +129,9 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
             const matchingFriends = friends.filter(friend => {
               if (!selectedTrait) return true;
               const target = normalize(selectedTrait);
-              return friend.traits.some(t => {
-                const normT = normalize(t);
+              const traits = Array.isArray(friend.traits) ? friend.traits : [];
+              return traits.some(t => {
+                const normT = normalize(t || '');
                 return normT === target || normT.includes(target) || target.includes(normT);
               });
             });
@@ -169,13 +170,14 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
                     {MAIN_CHARACTERISTICS.map((item) => {
                       const Icon = item.icon;
                       const isSelected = selectedTrait === item.id;
-                      const count = friends.filter(f => 
-                        f.traits.some(t => {
-                          const nT = normalize(t);
+                      const count = friends.filter(f => {
+                        const traits = Array.isArray(f.traits) ? f.traits : [];
+                        return traits.some(t => {
+                          const nT = normalize(t || '');
                           const nTarget = normalize(item.id);
                           return nT === nTarget || nT.includes(nTarget) || nTarget.includes(nT);
-                        })
-                      ).length;
+                        });
+                      }).length;
 
                       return (
                         <button
@@ -270,11 +272,11 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
 
                           <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
                             <div className="flex flex-wrap gap-1 max-w-[60%]">
-                              {friend.traits.slice(0, 3).map((t, idx) => (
+                              {(Array.isArray(friend.traits) ? friend.traits : []).slice(0, 3).map((t, idx) => (
                                 <span
                                   key={idx}
                                   className={`text-[9px] px-1.5 py-0.5 rounded font-semibold ${
-                                    normalize(t) === normalize(selectedTrait)
+                                    normalize(t || '') === normalize(selectedTrait)
                                       ? 'bg-sky-500 text-white'
                                       : 'bg-slate-100 text-slate-600'
                                   }`}
@@ -375,10 +377,13 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
               return s.sport.toLowerCase().includes(selectedSportFilter.toLowerCase());
             });
 
-            const sportsFriends = friends.filter(f => f.traits.some(t => {
-              const norm = t.toLowerCase();
-              return norm.includes('deporte') || norm.includes('fútbol') || norm.includes('futbol') || norm.includes('básquet') || norm.includes('padel') || norm.includes('pádel') || norm.includes('running');
-            }));
+            const sportsFriends = friends.filter(f => {
+              const traits = Array.isArray(f.traits) ? f.traits : [];
+              return traits.some(t => {
+                const norm = (t || '').toLowerCase();
+                return norm.includes('deporte') || norm.includes('fútbol') || norm.includes('futbol') || norm.includes('básquet') || norm.includes('padel') || norm.includes('pádel') || norm.includes('running');
+              });
+            });
 
             return (
               <div className="space-y-6">
@@ -1505,18 +1510,24 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-3 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-rose-500" />
                   <span>Amigos con afinidad a Gimnasio & Fitness ({
-                    friends.filter(f => f.traits.some(t => {
-                      const norm = t.toLowerCase();
-                      return norm.includes('gimnasio') || norm.includes('gym') || norm.includes('deportes') || norm.includes('fitness');
-                    })).length
+                    friends.filter(f => {
+                      const traits = Array.isArray(f.traits) ? f.traits : [];
+                      return traits.some(t => {
+                        const norm = (t || '').toLowerCase();
+                        return norm.includes('gimnasio') || norm.includes('gym') || norm.includes('deportes') || norm.includes('fitness');
+                      });
+                    }).length
                   })</span>
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {friends
-                    .filter(f => f.traits.some(t => {
-                      const norm = t.toLowerCase();
-                      return norm.includes('gimnasio') || norm.includes('gym') || norm.includes('deportes') || norm.includes('fitness');
-                    }))
+                    .filter(f => {
+                      const traits = Array.isArray(f.traits) ? f.traits : [];
+                      return traits.some(t => {
+                        const norm = (t || '').toLowerCase();
+                        return norm.includes('gimnasio') || norm.includes('gym') || norm.includes('deportes') || norm.includes('fitness');
+                      });
+                    })
                     .map((friend) => {
                       const comp = calculateCompatibility(friend, currentUserProfile);
                       return (

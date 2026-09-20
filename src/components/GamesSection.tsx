@@ -1032,10 +1032,13 @@ export const GamesSection: React.FC<GamesSectionProps> = ({
             <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
               <Gamepad2 className="w-4 h-4 text-violet-600" />
               <span>Amigos con afinidad Gamer & Videojuegos ({
-                friends.filter(f => f.traits.some(t => {
-                  const norm = t.toLowerCase();
-                  return norm.includes('juego') || norm.includes('videojuego') || norm.includes('gamer') || norm.includes('gaming') || norm.includes('corona');
-                })).length
+                friends.filter(f => {
+                  const traits = Array.isArray(f.traits) ? f.traits : [];
+                  return traits.some(t => {
+                    const norm = (t || '').toLowerCase();
+                    return norm.includes('juego') || norm.includes('videojuego') || norm.includes('gamer') || norm.includes('gaming') || norm.includes('corona');
+                  });
+                }).length
               })</span>
             </h4>
             <p className="text-xs text-slate-500 mt-0.5">Conéctate para jugar partidas y coordinar torneos</p>
@@ -1044,10 +1047,13 @@ export const GamesSection: React.FC<GamesSectionProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {friends
-            .filter(f => f.traits.some(t => {
-              const norm = t.toLowerCase();
-              return norm.includes('juego') || norm.includes('videojuego') || norm.includes('gamer') || norm.includes('gaming') || norm.includes('corona');
-            }))
+            .filter(f => {
+              const traits = Array.isArray(f.traits) ? f.traits : [];
+              return traits.some(t => {
+                const norm = (t || '').toLowerCase();
+                return norm.includes('juego') || norm.includes('videojuego') || norm.includes('gamer') || norm.includes('gaming') || norm.includes('corona');
+              });
+            })
             .map((friend) => (
               <div
                 key={friend.id}

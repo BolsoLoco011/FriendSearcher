@@ -31,16 +31,16 @@ export function isTestingEnvironment(): boolean {
 }
 
 export const HARDCODED_ADMINS: string[] = [
-  DEFAULT_ADMIN_EMAIL
+  DEFAULT_ADMIN_EMAIL,
+  TESTING_ADMIN_EMAIL
 ];
 
 /**
  * Returns the list of hardcoded administrators active for the current environment.
  */
 export function getHardcodedAdmins(): string[] {
-  const admins = [DEFAULT_ADMIN_EMAIL.toLowerCase()];
+  const admins = [DEFAULT_ADMIN_EMAIL.toLowerCase(), TESTING_ADMIN_EMAIL.toLowerCase()];
   if (isTestingEnvironment()) {
-    admins.push(TESTING_ADMIN_EMAIL.toLowerCase());
     admins.push('j.ipar@elbiofernandez.edu.uy');
   }
   return admins;

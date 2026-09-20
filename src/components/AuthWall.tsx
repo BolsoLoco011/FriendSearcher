@@ -100,6 +100,16 @@ export const AuthWall: React.FC<AuthWallProps> = ({
           approvalStatus: 'pending',
           requestedAt: now,
           updatedAt: now,
+          traits: ['AMISTAD', 'COMPAÑERISMO'],
+          city: 'Montevideo',
+          occupation: 'Estudiante',
+          bio: 'Nuevo integrante del colegio en FriendSearcher.',
+          favoriteFood: 'Milanesas con papas fritas',
+          favoriteMemeStyle: 'Memes de risa',
+          age: 12,
+          matchScore: 85,
+          highlightCategory: 'caracteristicas',
+          isConnected: false,
         }, { merge: true });
       }
 
