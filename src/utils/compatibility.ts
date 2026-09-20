@@ -11,7 +11,7 @@ export interface CompatibilityResult {
  * Extracts key normalized words from a text string (excluding common stop words).
  */
 function extractKeywords(text: string | undefined): string[] {
-  if (!text) return [];
+  if (!text || typeof text !== 'string') return [];
   const stopWords = new Set([
     'de', 'la', 'el', 'los', 'las', 'y', 'o', 'en', 'con', 'para', 'un', 'una', 
     'unos', 'unas', 'del', 'al', 'mi', 'mis', 'me', 'gusta', 'mucho', 'tipo', 'estilo'
@@ -39,7 +39,7 @@ export function calculateCompatibility(
   if (referenceUser && (referenceUser.id === targetUser.id || (referenceUser.email && referenceUser.email === targetUser.email))) {
     return {
       score: 100,
-      sharedTraits: targetUser.traits || [],
+      sharedTraits: Array.isArray(targetUser.traits) ? targetUser.traits : [],
       reasons: ['¡Eres tú! Tu propio perfil escolar.'],
       affinityLevel: 'Perfecta' as any
     };
@@ -61,8 +61,12 @@ export function calculateCompatibility(
   }
 
   // 1. Common Traits / Interests (up to 25 points)
-  const refTraits = (referenceUser.traits || []).map(t => t.trim().toUpperCase());
-  const targetTraits = (targetUser.traits || []).map(t => t.trim().toUpperCase());
+  const refTraits = (Array.isArray(referenceUser.traits) ? referenceUser.traits : [])
+    .filter(t => typeof t === 'string')
+    .map(t => t.trim().toUpperCase());
+  const targetTraits = (Array.isArray(targetUser.traits) ? targetUser.traits : [])
+    .filter(t => typeof t === 'string')
+    .map(t => t.trim().toUpperCase());
   
   const sharedTraits = targetTraits.filter(trait => 
     refTraits.some(refT => refT === trait || refT.includes(trait) || trait.includes(refT))

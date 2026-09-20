@@ -15,6 +15,7 @@ import { FirestoreManagerModal } from './components/FirestoreManagerModal';
 import { AuthWall } from './components/AuthWall';
 import { PendingApprovalScreen } from './components/PendingApprovalScreen';
 import { OnboardingProfileModal } from './components/OnboardingProfileModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { unifyDuplicateProfiles } from './utils/unifyProfiles';
 import { 
   CATEGORIES_DATA, 
@@ -314,7 +315,32 @@ export default function App() {
           setDoc(doc(db, 'users', f.id), f, { merge: true }).catch(() => {});
         });
       } else {
-        const list = snapshot.docs.map(d => ({ ...d.data(), id: d.id } as FriendProfile));
+        const list = snapshot.docs.map(d => {
+          const data = d.data();
+          return {
+            ...data,
+            id: d.id,
+            name: data.name || data.realName || (typeof data.email === 'string' ? data.email.split('@')[0] : '') || 'Alumno/a',
+            realName: data.realName || data.name || '',
+            email: data.email || '',
+            age: typeof data.age === 'number' ? data.age : 12,
+            city: data.city || 'Montevideo',
+            occupation: data.occupation || 'Estudiante',
+            bio: data.bio || '¡Hola! Formo parte de la comunidad FriendSearcher.',
+            avatar: data.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+            matchScore: typeof data.matchScore === 'number' ? data.matchScore : 85,
+            highlightCategory: data.highlightCategory || 'caracteristicas',
+            traits: Array.isArray(data.traits) ? data.traits : ['AMISTAD', 'BUENA ONDA'],
+            favoriteFood: data.favoriteFood || 'Milanesas con papas fritas',
+            favoriteMemeStyle: data.favoriteMemeStyle || 'Memes de risa',
+            joinedEvent: data.joinedEvent || '',
+            joinedGroup: data.joinedGroup || '',
+            isConnected: Boolean(data.isConnected),
+            approvalStatus: data.approvalStatus || 'approved',
+            isAdmin: Boolean(data.isAdmin),
+            role: data.role || 'user',
+          } as FriendProfile;
+        });
         setFriends(list);
 
         // Ensure f-2 is removed from Firestore if present
@@ -324,7 +350,7 @@ export default function App() {
 
         // Auto-upgrade f-1 in Firestore if it still has Bruno or needs Benja data
         const f1Doc = list.find(d => d.id === 'f-1');
-        if (f1Doc && (f1Doc.name.toLowerCase().includes('bruno') || f1Doc.avatar.includes('bruno') || !f1Doc.secondaryAvatar)) {
+        if (f1Doc && (((f1Doc.name || '').toLowerCase().includes('bruno')) || ((f1Doc.avatar || '').includes('bruno')) || !f1Doc.secondaryAvatar)) {
           const benjaData = INITIAL_FRIENDS.find(f => f.id === 'f-1');
           if (benjaData) {
             setDoc(doc(db, 'users', 'f-1'), benjaData, { merge: true }).catch(() => {});
@@ -511,7 +537,32 @@ export default function App() {
     setIsSyncing(true);
     try {
       const snap = await getDocs(collection(db, 'users'));
-      const list = snap.docs.map(d => ({ ...d.data(), id: d.id } as FriendProfile));
+      const list = snap.docs.map(d => {
+        const data = d.data();
+        return {
+          ...data,
+          id: d.id,
+          name: data.name || data.realName || (typeof data.email === 'string' ? data.email.split('@')[0] : '') || 'Alumno/a',
+          realName: data.realName || data.name || '',
+          email: data.email || '',
+          age: typeof data.age === 'number' ? data.age : 12,
+          city: data.city || 'Montevideo',
+          occupation: data.occupation || 'Estudiante',
+          bio: data.bio || '¡Hola! Formo parte de la comunidad FriendSearcher.',
+          avatar: data.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+          matchScore: typeof data.matchScore === 'number' ? data.matchScore : 85,
+          highlightCategory: data.highlightCategory || 'caracteristicas',
+          traits: Array.isArray(data.traits) ? data.traits : ['AMISTAD', 'BUENA ONDA'],
+          favoriteFood: data.favoriteFood || 'Milanesas con papas fritas',
+          favoriteMemeStyle: data.favoriteMemeStyle || 'Memes de risa',
+          joinedEvent: data.joinedEvent || '',
+          joinedGroup: data.joinedGroup || '',
+          isConnected: Boolean(data.isConnected),
+          approvalStatus: data.approvalStatus || 'approved',
+          isAdmin: Boolean(data.isAdmin),
+          role: data.role || 'user',
+        } as FriendProfile;
+      });
       setFriends(list);
     } catch (e) {
       console.error(e);
@@ -1013,21 +1064,23 @@ export default function App() {
         />
 
         {/* 2. FEED Y BUSCADOR DE AMIGOS CON CARGA DESDE FIRESTORE */}
-        <FriendsFeed
-          friends={friends}
-          selectedCategory={selectedCategory}
-          onSelectCategory={(cat) => setSelectedCategory(cat)}
-          onOpenFriendDetail={(friend) => setActiveFriendModal(friend)}
-          onToggleConnect={handleToggleConnect}
-          activeTraitFilter={activeTraitFilter}
-          onClearTraitFilter={() => setActiveTraitFilter(null)}
-          isLoading={isLoadingUsers}
-          onDeleteFriend={handleDeleteFriend}
-          onOpenDbManager={() => { setEditingFriendIdForDb(null); setIsDbModalOpen(true); }}
-          currentUserProfile={activeUserProfile}
-          isAdmin={isAdmin}
-          onEditFriendInDb={handleOpenEditFriendInDb}
-        />
+        <ErrorBoundary fallbackTitle="Error al cargar el muro de amigos">
+          <FriendsFeed
+            friends={friends.filter(f => f.approvalStatus !== 'pending')}
+            selectedCategory={selectedCategory}
+            onSelectCategory={(cat) => setSelectedCategory(cat)}
+            onOpenFriendDetail={(friend) => setActiveFriendModal(friend)}
+            onToggleConnect={handleToggleConnect}
+            activeTraitFilter={activeTraitFilter}
+            onClearTraitFilter={() => setActiveTraitFilter(null)}
+            isLoading={isLoadingUsers}
+            onDeleteFriend={handleDeleteFriend}
+            onOpenDbManager={() => { setEditingFriendIdForDb(null); setIsDbModalOpen(true); }}
+            currentUserProfile={activeUserProfile}
+            isAdmin={isAdmin}
+            onEditFriendInDb={handleOpenEditFriendInDb}
+          />
+        </ErrorBoundary>
 
       </main>
 

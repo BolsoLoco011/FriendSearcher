@@ -63,63 +63,67 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
   }));
 
   const filteredFriends = friendsWithCompatibility.filter((friend) => {
+    const traits = Array.isArray(friend.traits) ? friend.traits : [];
+
     // Category match
     if (selectedCategory !== 'all' && friend.highlightCategory !== selectedCategory) {
       // Also check if category keywords match
       const catMatch = 
-        (selectedCategory === 'caracteristicas' && friend.traits.length > 0) ||
+        (selectedCategory === 'caracteristicas' && traits.length > 0) ||
         (selectedCategory === 'deportes' && (
-          friend.traits.some(t => {
-            const n = t.toLowerCase();
+          traits.some(t => {
+            const n = (t || '').toLowerCase();
             return n.includes('deporte') || n.includes('fútbol') || n.includes('futbol') || n.includes('básquet') || n.includes('basquet') || n.includes('running') || n.includes('tenis') || n.includes('pádel') || n.includes('padel');
           }) ||
-          friend.joinedGroup?.toLowerCase().includes('futbol') ||
-          friend.joinedGroup?.toLowerCase().includes('deporte') ||
-          friend.joinedEvent?.toLowerCase().includes('futbol')
+          (friend.joinedGroup || '').toLowerCase().includes('futbol') ||
+          (friend.joinedGroup || '').toLowerCase().includes('deporte') ||
+          (friend.joinedEvent || '').toLowerCase().includes('futbol')
         )) ||
-        (selectedCategory === 'memes' && friend.favoriteMemeStyle) ||
-        (selectedCategory === 'cocina' && friend.favoriteFood) ||
-        (selectedCategory === 'eventos' && friend.joinedEvent) ||
-        (selectedCategory === 'grupos' && friend.joinedGroup) ||
+        (selectedCategory === 'memes' && Boolean(friend.favoriteMemeStyle)) ||
+        (selectedCategory === 'cocina' && Boolean(friend.favoriteFood)) ||
+        (selectedCategory === 'eventos' && Boolean(friend.joinedEvent)) ||
+        (selectedCategory === 'grupos' && Boolean(friend.joinedGroup)) ||
         (selectedCategory === 'gimnasio' && (
-          friend.traits.some(t => {
-            const n = t.toLowerCase();
+          traits.some(t => {
+            const n = (t || '').toLowerCase();
             return n.includes('gimnasio') || n.includes('gym') || n.includes('deportes') || n.includes('fitness');
           }) ||
-          friend.joinedGroup?.toLowerCase().includes('futbol') ||
-          friend.joinedEvent?.toLowerCase().includes('futbol')
+          (friend.joinedGroup || '').toLowerCase().includes('futbol') ||
+          (friend.joinedEvent || '').toLowerCase().includes('futbol')
         )) ||
         (selectedCategory === 'juegos' && (
-          friend.traits.some(t => {
-            const n = t.toLowerCase();
+          traits.some(t => {
+            const n = (t || '').toLowerCase();
             return n.includes('juego') || n.includes('videojuego') || n.includes('gamer') || n.includes('gaming') || n.includes('corona');
           }) ||
-          friend.occupation?.toLowerCase().includes('gamer') ||
-          friend.joinedGroup?.toLowerCase().includes('gaming') ||
-          friend.joinedGroup?.toLowerCase().includes('juegos')
+          (friend.occupation || '').toLowerCase().includes('gamer') ||
+          (friend.joinedGroup || '').toLowerCase().includes('gaming') ||
+          (friend.joinedGroup || '').toLowerCase().includes('juegos')
         ));
       if (!catMatch) return false;
     }
 
     // Trait filter from modal if active
     if (activeTraitFilter) {
-      const hasTrait = friend.traits.some(t => t.toLowerCase().includes(activeTraitFilter.toLowerCase()));
+      const activeTraitLower = activeTraitFilter.toLowerCase();
+      const hasTrait = traits.some(t => (t || '').toLowerCase().includes(activeTraitLower));
       if (!hasTrait) return false;
     }
 
     // Real dynamic match score filter
-    if (friend.dynamicCompatibility.score < minMatch) return false;
+    const score = friend.dynamicCompatibility?.score ?? 85;
+    if (score < minMatch) return false;
 
     // Search query match
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
-      friend.name.toLowerCase().includes(q) ||
-      friend.city.toLowerCase().includes(q) ||
-      friend.bio.toLowerCase().includes(q) ||
-      friend.traits.some(t => t.toLowerCase().includes(q)) ||
-      friend.favoriteFood.toLowerCase().includes(q) ||
-      friend.favoriteMemeStyle.toLowerCase().includes(q)
+      (friend.name || '').toLowerCase().includes(q) ||
+      (friend.city || '').toLowerCase().includes(q) ||
+      (friend.bio || '').toLowerCase().includes(q) ||
+      traits.some(t => (t || '').toLowerCase().includes(q)) ||
+      (friend.favoriteFood || '').toLowerCase().includes(q) ||
+      (friend.favoriteMemeStyle || '').toLowerCase().includes(q)
     );
   });
 
@@ -357,18 +361,18 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
                 <div className="relative p-5 pb-0 flex items-center gap-3.5">
                   <div className="relative">
                     <img
-                      src={friend.avatar}
-                      alt={friend.name}
+                      src={friend.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
+                      alt={friend.name || 'Alumno/a'}
                       referrerPolicy="no-referrer"
                       className="w-16 h-16 rounded-2xl object-cover border-2 border-sky-300 group-hover:border-sky-500 transition-colors shadow-2xs bg-slate-900"
                     />
                     <span 
                       className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full text-white text-[9px] font-bold shadow-xs bg-sky-600"
-                      title={`Compatibilidad real: ${friend.dynamicCompatibility.score}% (${friend.dynamicCompatibility.affinityLevel})`}
+                      title={`Compatibilidad real: ${friend.dynamicCompatibility?.score ?? 85}% (${friend.dynamicCompatibility?.affinityLevel || 'Buena'})`}
                     >
-                      {friend.dynamicCompatibility.score}%
+                      {friend.dynamicCompatibility?.score ?? 85}%
                     </span>
-                    {(friend.id === 'f-1' || friend.secondaryAvatar || friend.name.toLowerCase().includes('benja')) && (
+                    {(friend.id === 'f-1' || friend.secondaryAvatar || ((friend.name || '').toLowerCase().includes('benja'))) && (
                       <span 
                         className="absolute -top-1.5 -left-1.5 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-slate-950 text-white shadow-xs border border-sky-300 flex items-center gap-0.5"
                         title="Tiene 2 fotos de perfil: Corona Chalk y Gatito"
@@ -381,17 +385,17 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1">
                       <h3 className="text-base font-bold text-sky-950 truncate group-hover:text-sky-600 transition-colors">
-                        {friend.name}, <span className="font-normal text-sky-700 text-xs">{friend.age}</span>
+                        {friend.name || 'Alumno/a'}, <span className="font-normal text-sky-700 text-xs">{friend.age ?? 12}</span>
                       </h3>
                       <span className="text-[10px] font-mono text-sky-800 bg-sky-200/80 px-1.5 py-0.5 rounded border border-sky-300">
                         id: {friend.id}
                       </span>
                     </div>
-                    <p className="text-xs text-sky-800 truncate font-medium">{friend.occupation}</p>
+                    <p className="text-xs text-sky-800 truncate font-medium">{friend.occupation || 'Estudiante'}</p>
                     <p className="text-[11px] text-sky-700 font-semibold flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3 h-3" /> {friend.city}
+                      <MapPin className="w-3 h-3" /> {friend.city || 'Montevideo'}
                     </p>
-                    {friend.dynamicCompatibility.reasons.length > 0 && (
+                    {friend.dynamicCompatibility?.reasons && friend.dynamicCompatibility.reasons.length > 0 && (
                       <div className="mt-1 flex items-center gap-1 text-[10px] text-sky-950 bg-sky-200/70 px-2 py-0.5 rounded-md border border-sky-300 truncate">
                         <Sparkles className="w-3 h-3 text-sky-600 shrink-0" />
                         <span className="truncate font-medium">{friend.dynamicCompatibility.reasons[0]}</span>
@@ -403,25 +407,30 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
                 {/* Bio */}
                 <div className="px-5 py-3">
                   <p className="text-xs text-sky-900 line-clamp-2 leading-relaxed">
-                    {friend.bio}
+                    {friend.bio || '¡Hola! Me alegra ser parte de FriendSearcher.'}
                   </p>
 
                   {/* Traits pills */}
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    {friend.traits.slice(0, 3).map((trait) => (
-                      <span
-                        key={trait}
-                        className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-sky-200/90 text-sky-950 border border-sky-300"
-                      >
-                        #{trait}
-                      </span>
-                    ))}
-                    {friend.traits.length > 3 && (
-                      <span className="px-1.5 py-0.5 rounded-md text-[10px] text-sky-900 font-bold bg-sky-300/80 border border-sky-400">
-                        +{friend.traits.length - 3}
-                      </span>
-                    )}
-                  </div>
+                  {(() => {
+                    const traitsList = Array.isArray(friend.traits) ? friend.traits : [];
+                    return (
+                      <div className="flex flex-wrap gap-1.5 mt-3">
+                        {traitsList.slice(0, 3).map((trait) => (
+                          <span
+                            key={trait}
+                            className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-sky-200/90 text-sky-950 border border-sky-300"
+                          >
+                            #{trait}
+                          </span>
+                        ))}
+                        {traitsList.length > 3 && (
+                          <span className="px-1.5 py-0.5 rounded-md text-[10px] text-sky-900 font-bold bg-sky-300/80 border border-sky-400">
+                            +{traitsList.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   {/* Highlighting 2 Pillars */}
                   <div className="mt-3.5 pt-3 border-t border-sky-200 space-y-1.5 text-[11px] bg-sky-100/80 p-2.5 rounded-xl border border-sky-300">
@@ -429,7 +438,7 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
                       <div className="flex items-center gap-2 truncate flex-1 min-w-0">
                         <Utensils className="w-3.5 h-3.5 text-sky-600 flex-shrink-0" />
                         <span className="text-sky-700 font-semibold">Cocina:</span>
-                        <span className="truncate text-sky-950 font-bold">{friend.favoriteFood}</span>
+                        <span className="truncate text-sky-950 font-bold">{friend.favoriteFood || 'Milanesas con papas fritas'}</span>
                       </div>
                       {isAdmin && onEditFriendInDb && (
                         <button
@@ -446,7 +455,7 @@ export const FriendsFeed: React.FC<FriendsFeedProps> = ({
                     <div className="flex items-center gap-2 text-sky-900 truncate">
                       <Laugh className="w-3.5 h-3.5 text-sky-600 flex-shrink-0" />
                       <span className="text-sky-700 font-semibold">Humor:</span>
-                      <span className="truncate text-sky-950 font-medium">{friend.favoriteMemeStyle}</span>
+                      <span className="truncate text-sky-950 font-medium">{friend.favoriteMemeStyle || 'Memes de risa'}</span>
                     </div>
                   </div>
                 </div>

@@ -18,8 +18,9 @@ export const TESTING_ADMIN_EMAIL = 'ipar.fernando@gmail.com';
 export function isTestingEnvironment(): boolean {
   if (typeof window === 'undefined') return false;
   const hostname = window.location.hostname.toLowerCase();
-  // Production domain is strictly protected from testing rules
-  if (hostname === 'friendsearcherelef.ai.studio') return false;
+  // Production domains (freandsearcher.ai.studio, friendsearcherelef.ai.studio, etc.) are strictly protected
+  if (hostname.endsWith('.ai.studio') && hostname !== TESTING_DOMAIN) return false;
+  if (hostname === 'freandsearcher.ai.studio' || hostname === 'friendsearcherelef.ai.studio') return false;
   const isDev = Boolean((import.meta as { env?: { DEV?: boolean } })?.env?.DEV);
   return (
     hostname === TESTING_DOMAIN ||
@@ -30,16 +31,16 @@ export function isTestingEnvironment(): boolean {
 }
 
 export const HARDCODED_ADMINS: string[] = [
-  DEFAULT_ADMIN_EMAIL
+  DEFAULT_ADMIN_EMAIL,
+  TESTING_ADMIN_EMAIL
 ];
 
 /**
  * Returns the list of hardcoded administrators active for the current environment.
  */
 export function getHardcodedAdmins(): string[] {
-  const admins = [DEFAULT_ADMIN_EMAIL.toLowerCase()];
+  const admins = [DEFAULT_ADMIN_EMAIL.toLowerCase(), TESTING_ADMIN_EMAIL.toLowerCase()];
   if (isTestingEnvironment()) {
-    admins.push(TESTING_ADMIN_EMAIL.toLowerCase());
     admins.push('j.ipar@elbiofernandez.edu.uy');
   }
   return admins;

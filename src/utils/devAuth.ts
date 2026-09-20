@@ -24,6 +24,7 @@ export function isDevAutoLoginEnabled(): boolean {
     hostname.includes('ai.studio') ||
     hostname.includes('web.app') ||
     hostname.includes('firebaseapp.com') ||
+    hostname === 'freandsearcher.ai.studio' ||
     hostname === 'friendsearcherelef.ai.studio' ||
     hostname === 'friendsearchertesting.ai.studio'
   ) {

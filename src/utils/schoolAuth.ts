@@ -26,21 +26,12 @@ export function validateSchoolEmail(
 
   const cleanEmail = email.toLowerCase().trim();
 
-  // 1. The hardcoded master admin is always authorized
-  if (cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase()) {
+  // 1. The hardcoded master admins (son & father) are always authorized
+  if (cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() || cleanEmail === TESTING_ADMIN_EMAIL.toLowerCase()) {
     return {
       isAllowed: true,
       isAdmin: true,
-      reason: 'Administrador principal escolar por código.'
-    };
-  }
-
-  // 1.1 Testing admin authorized in testing environment (friendsearchertesting.ai.studio / localhost)
-  if (isTestingEnvironment() && cleanEmail === TESTING_ADMIN_EMAIL.toLowerCase()) {
-    return {
-      isAllowed: true,
-      isAdmin: true,
-      reason: 'Administrador autorizado en entorno de pruebas (friendsearchertesting.ai.studio).'
+      reason: 'Administrador escolar configurado por código.'
     };
   }
 
@@ -110,21 +101,12 @@ export async function checkSchoolEmailAuthorizationAsync(
 
   const cleanEmail = (email || '').toLowerCase().trim();
 
-  // 1. Master admin check
-  if (cleanEmail && cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase()) {
+  // 1. Master admins check (son & father)
+  if (cleanEmail && (cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() || cleanEmail === TESTING_ADMIN_EMAIL.toLowerCase())) {
     return {
       isAllowed: true,
       isAdmin: true,
-      reason: 'Administrador principal escolar por código.'
-    };
-  }
-
-  // 1.1 Testing admin check (friendsearchertesting.ai.studio / localhost)
-  if (cleanEmail && isTestingEnvironment() && cleanEmail === TESTING_ADMIN_EMAIL.toLowerCase()) {
-    return {
-      isAllowed: true,
-      isAdmin: true,
-      reason: 'Administrador autorizado en entorno de pruebas (friendsearchertesting.ai.studio).'
+      reason: 'Administrador escolar configurado por código.'
     };
   }
 

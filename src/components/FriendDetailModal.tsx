@@ -344,7 +344,7 @@ export const FriendDetailModal: React.FC<FriendDetailModalProps> = ({
                 <span>Características & Rasgos</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {friend.traits.map(trait => (
+                {(Array.isArray(friend.traits) ? friend.traits : []).map(trait => (
                   <span key={trait} className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-sky-50 text-sky-700 border border-sky-200/70">
                     {trait}
                   </span>

@@ -37,6 +37,7 @@ export interface FriendProfile {
   schoolCodeUsed?: boolean;
   gradeOrClass?: string;
   realName?: string;
+  photo?: string;
   requestedAt?: string;
   approvedAt?: string;
   approvedBy?: string;
@@ -81,9 +82,12 @@ export interface EventItem {
 export interface GroupItem {
   id: string;
   name: string;
+  title?: string;
+  category?: string;
   description: string;
   imageUrl: string;
   members: number;
+  membersCount?: number;
   activityLevel: 'Muy activo' | 'Activo' | 'Nuevo';
   tags: string[];
   isJoined?: boolean;

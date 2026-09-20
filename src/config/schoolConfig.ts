@@ -49,7 +49,7 @@ export const SCHOOL_CONFIG: SchoolConfigType = {
     schoolCodeSectionTitle: '¿Tienes el código escolar?',
     schoolCodeSectionDescription:
       'Si tienes el código que se compartió en el colegio, ingrésalo aquí para activar tu cuenta de inmediato sin esperar.',
-    schoolCodePlaceholder: 'Ej: El recreo FriendSearcher',
+    schoolCodePlaceholder: 'Ej: El recreo con amigos',
     schoolCodeButton: 'Activar Cuenta de Inmediato',
     schoolCodeSuccess: '¡Código escolar correcto! Tu cuenta fue aprobada automáticamente.',
     schoolCodeError: 'El código escolar ingresado no es correcto. Por favor verifica o espera la aprobación manual.',
